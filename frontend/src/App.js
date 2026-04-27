@@ -6,6 +6,8 @@ import StartScreen from "./components/StartScreen";
 import GameOver from "./components/GameOver";
 import Leaderboard from "./components/Leaderboard";
 import { Toaster } from "sonner";
+import { Volume2, VolumeX } from "lucide-react";
+import { sfx, setMuted, isMuted, unlockAudio } from "./lib/sounds";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -13,12 +15,12 @@ const API = `${BACKEND_URL}/api`;
 const FRIEND_LOGO = "https://customer-assets.emergentagent.com/job_767f29fe-abe6-4b75-8be0-f45420e11c5a/artifacts/nrmdvdis_friend.png";
 const NPSI_LOGO = "https://customer-assets.emergentagent.com/job_767f29fe-abe6-4b75-8be0-f45420e11c5a/artifacts/xpqzlet1_NPSI.ROCKS%20OXANIUM.png";
 
-// SCREENS: "start" | "playing" | "dead"
 function App() {
   const [screen, setScreen] = useState("start");
   const [finalStats, setFinalStats] = useState({ score: 0, wave: 1, kills: 0 });
   const [scores, setScores] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [muted, setMutedState] = useState(isMuted());
 
   const fetchScores = useCallback(async () => {
     try {
@@ -33,7 +35,17 @@ function App() {
     fetchScores();
   }, [fetchScores]);
 
+  const toggleMute = () => {
+    unlockAudio();
+    const next = !muted;
+    setMuted(next);
+    setMutedState(next);
+    if (!next) sfx.click();
+  };
+
   const handleStart = () => {
+    unlockAudio();
+    sfx.click();
     setScreen("playing");
   };
 
@@ -61,19 +73,27 @@ function App() {
   };
 
   const handleRestart = () => {
+    sfx.click();
     setScreen("playing");
   };
 
   const handleHome = () => {
+    sfx.click();
     setScreen("start");
     fetchScores();
   };
 
+  const appClass = [
+    "App",
+    screen === "playing" ? "app--playing" : "",
+    screen === "start" ? "app--start" : "",
+    screen === "dead" ? "app--dead" : "",
+  ].filter(Boolean).join(" ");
+
   return (
-    <div className={`App ${screen === "playing" ? "app--playing" : ""} ${screen === "start" ? "app--start" : ""} ${screen === "dead" ? "app--dead" : ""}`} data-testid="app-root">
+    <div className={appClass} data-testid="app-root">
       <Toaster position="top-center" theme="dark" />
 
-      {/* Background grain + grid */}
       <div className="bg-grid" aria-hidden="true" />
       <div className="bg-grain" aria-hidden="true" />
       <div className="bg-glow" aria-hidden="true" />
@@ -83,10 +103,20 @@ function App() {
           <img src={FRIEND_LOGO} alt="friend" className="dr-friend-logo" data-testid="friend-logo" />
           <div className="dr-title-block">
             <h1 className="dr-title" data-testid="dr-title">downtime<span className="dr-dot">.</span>raiders</h1>
-            <p className="dr-subtitle">// NPSI FLEET COMBAT SIM &middot; v1.0</p>
+            <p className="dr-subtitle">npsi.rocks</p>
           </div>
         </div>
         <div className="dr-header-right">
+          <button
+            type="button"
+            className="dr-mute-btn"
+            onClick={toggleMute}
+            data-testid="mute-btn"
+            aria-label={muted ? "Unmute" : "Mute"}
+            title={muted ? "Unmute" : "Mute"}
+          >
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
           <span className="dr-status">
             <span className="dr-status-dot" /> NODE STABLE
           </span>
@@ -117,15 +147,16 @@ function App() {
         )}
       </main>
 
-      <footer className="dr-footer" data-testid="dr-footer">
-        <div className="dr-footer-left">
-          <span className="dr-footer-label">A FAN PROJECT BY</span>
-          <img src={NPSI_LOGO} alt="NPSI.ROCKS" className="dr-npsi-logo" data-testid="npsi-logo" />
-        </div>
-        <div className="dr-footer-right">
-          <span className="dr-footer-tag">FLY IT LIKE YOU STOLE IT &middot; o7</span>
-        </div>
-      </footer>
+      {screen !== "playing" && (
+        <footer className="dr-footer" data-testid="dr-footer">
+          <div className="dr-footer-left">
+            <span className="dr-footer-label">A FAN PROJECT BY</span>
+            <img src={NPSI_LOGO} alt="NPSI.ROCKS" className="dr-npsi-logo" data-testid="npsi-logo" />
+          </div>
+          <div className="dr-footer-right">
+            <span className="dr-footer-tag">FLY IT LIKE YOU STOLE IT &middot; o7</span>
+          </div>
+        </footer>
       )}
     </div>
   );

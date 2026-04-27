@@ -141,6 +141,27 @@ body {
     gap: 12px;
 }
 
+.dr-mute-btn {
+    appearance: none;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    background: rgba(76, 29, 149, 0.18);
+    color: var(--dr-white);
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 120ms ease;
+}
+
+.dr-mute-btn:hover {
+    background: rgba(124, 58, 237, 0.35);
+    border-color: var(--dr-purple-light);
+    transform: translateY(-1px);
+}
+
 .dr-status {
     display: inline-flex;
     align-items: center;

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { sfx } from "../lib/sounds";
 
 /**
  * Top-down old-school space combat sim.
@@ -146,6 +147,7 @@ export default function Game({ onDeath }) {
     s.bombs -= 1;
     s.flash = 24;
     s.shake = 18;
+    sfx.bomb();
     // destroy all enemies and enemy bullets
     s.enemies.forEach((en) => {
       s.score += en.def.score;
@@ -268,6 +270,7 @@ export default function Game({ onDeath }) {
       s.enemiesToSpawn = 5 + s.wave * 2;
       s.spawnCooldown = 60;
       s.flash = 14;
+      sfx.wave();
     };
 
     const update = () => {
@@ -310,6 +313,7 @@ export default function Game({ onDeath }) {
             r: 3,
           });
         });
+        if (multi) sfx.shootMulti(); else sfx.shoot();
       }
 
       // stars
@@ -386,10 +390,13 @@ export default function Game({ onDeath }) {
               s.score += en.def.score;
               s.kills += 1;
               explode(s, en.x, en.y, en.def.color, 24);
+              if (en.type === "capital") sfx.bigExplode(); else sfx.explode();
               // 18% chance to drop a power-up
               if (Math.random() < 0.18) spawnPowerup(s, en.x, en.y);
               s.enemies.splice(j, 1);
               s.shake = Math.max(s.shake, 6);
+            } else {
+              sfx.hit();
             }
             break;
           }
@@ -426,6 +433,7 @@ export default function Game({ onDeath }) {
           applyPowerup(s, pu.type);
           s.powerups.splice(i, 1);
           explode(s, pu.x, pu.y, pu.def.color, 14);
+          sfx.powerup();
         }
       }
 
@@ -471,11 +479,13 @@ export default function Game({ onDeath }) {
       p.vy = 0;
       if (s.lives <= 0) {
         s.gameOver = true;
+        sfx.death();
         // delay so explosion shows
         setTimeout(() => {
           onDeath({ score: s.score, wave: s.wave, kills: s.kills });
         }, 800);
       } else {
+        sfx.explode();
         syncHud(s);
       }
     };
