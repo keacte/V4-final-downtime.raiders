@@ -126,179 +126,42 @@ export function startMusic() {
   const out = c.createGain();
   out.gain.value = 0.0;
   out.connect(masterGain);
-  // fade in
-  out.gain.linearRampToValueAtTime(0.5, c.currentTime + 1.2);
+  out.gain.linearRampToValueAtTime(0.55, c.currentTime + 0.4);
 
-  // reverb send
-  const reverb = makeReverb(c);
-  const wet = c.createGain();
-  wet.gain.value = 0.25;
-  reverb.connect(wet);
-  wet.connect(out);
+  // Iconic Space Invaders 4-note descending bass loop
+  // E2, D2, C2, B1 -> 82.41, 73.42, 65.41, 61.74 Hz
+  const NOTES = [82.41, 73.42, 65.41, 61.74];
 
-  // Am - F - G - Em — driving minor progression
-  // root frequencies (low octave): A2=110, F2=87.31, G2=98, E2=82.41
-  const progression = [
-    { root: 110.0,  chord: [220.0,  261.63, 329.63] }, // Am
-    { root: 87.31,  chord: [174.61, 220.0,  261.63] }, // F
-    { root: 98.0,   chord: [196.0,  246.94, 293.66] }, // G
-    { root: 82.41,  chord: [164.81, 196.0,  246.94] }, // Em
-  ];
-
-  // BASS oscillator (continuous, retuned per chord)
+  // Single square-wave bass (mono)
   const bass = c.createOscillator();
-  const bassFilter = c.createBiquadFilter();
-  bassFilter.type = "lowpass";
-  bassFilter.frequency.value = 900;
-  bassFilter.Q.value = 8;
   const bassGain = c.createGain();
-  bassGain.gain.value = 0.34;
-  bass.type = "sawtooth";
-  bass.frequency.setValueAtTime(progression[0].root, c.currentTime);
-  bass.connect(bassFilter);
-  bassFilter.connect(bassGain);
+  bass.type = "square";
+  bass.frequency.setValueAtTime(NOTES[0], c.currentTime);
+  bassGain.gain.value = 0.0001;
+  bass.connect(bassGain);
   bassGain.connect(out);
   bass.start();
 
-  // PAD (chord oscillators)
-  const padOscs = [];
-  const padGain = c.createGain();
-  padGain.gain.value = 0.06;
-  const padFilter = c.createBiquadFilter();
-  padFilter.type = "lowpass";
-  padFilter.frequency.value = 2000;
-  padGain.connect(padFilter);
-  padFilter.connect(out);
-  padFilter.connect(reverb);
-
-  for (let i = 0; i < 3; i++) {
-    const osc = c.createOscillator();
-    osc.type = i === 0 ? "sawtooth" : "triangle";
-    osc.frequency.setValueAtTime(progression[0].chord[i], c.currentTime);
-    osc.detune.value = (i - 1) * 6;
-    osc.connect(padGain);
-    osc.start();
-    padOscs.push(osc);
-  }
-
-  // LEAD arpeggio
-  const arpGain = c.createGain();
-  arpGain.gain.value = 0.0;
-  const arpFilter = c.createBiquadFilter();
-  arpFilter.type = "lowpass";
-  arpFilter.frequency.value = 2600;
-  arpFilter.Q.value = 4;
-  arpGain.connect(arpFilter);
-  arpFilter.connect(out);
-  arpFilter.connect(reverb);
-
-  const arpOsc = c.createOscillator();
-  arpOsc.type = "square";
-  arpOsc.frequency.value = 440;
-  arpOsc.connect(arpGain);
-  arpOsc.start();
-
-  // KICK drum (sine pitch-drop) — function so we can trigger per beat
-  const kickOnce = () => {
-    const now = c.currentTime;
-    const k = c.createOscillator();
-    const kg = c.createGain();
-    k.type = "sine";
-    k.frequency.setValueAtTime(140, now);
-    k.frequency.exponentialRampToValueAtTime(45, now + 0.13);
-    kg.gain.setValueAtTime(0.0001, now);
-    kg.gain.exponentialRampToValueAtTime(0.55, now + 0.005);
-    kg.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-    k.connect(kg);
-    kg.connect(out);
-    k.start(now);
-    k.stop(now + 0.2);
-  };
-
-  // HI-HAT (filtered noise burst)
-  let hatBuffer = null;
-  const hatOnce = (vol = 0.25) => {
-    const now = c.currentTime;
-    if (!hatBuffer) {
-      const len = Math.floor(c.sampleRate * 0.05);
-      hatBuffer = c.createBuffer(1, len, c.sampleRate);
-      const d = hatBuffer.getChannelData(0);
-      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    }
-    const src = c.createBufferSource();
-    src.buffer = hatBuffer;
-    const hp = c.createBiquadFilter();
-    hp.type = "highpass";
-    hp.frequency.value = 6000;
-    const hg = c.createGain();
-    hg.gain.setValueAtTime(vol, now);
-    hg.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-    src.connect(hp);
-    hp.connect(hg);
-    hg.connect(out);
-    src.start(now);
-    src.stop(now + 0.06);
-  };
-
-  // Tempo: ~140 bpm 16ths -> 107ms per step. 8 steps per chord = 855ms per chord.
-  const beatMs = 110;
-  const stepsPerChord = 8;
-  let chordIdx = 0;
-  let arpStep = 0;
+  let step = 0;
+  const stepMs = 380; // ~158 BPM quarter-note pulse — classic invaders feel
 
   const tick = () => {
     if (!musicNodes) return;
     const now = c.currentTime;
-    const chord = progression[chordIdx];
-    // arp pattern - higher octave, more melodic
-    const notes = [
-      chord.chord[0] * 2,
-      chord.chord[2],
-      chord.chord[1] * 2,
-      chord.chord[2] * 2,
-      chord.chord[1] * 2,
-      chord.chord[0] * 2,
-      chord.chord[2],
-      chord.chord[1] * 2,
-    ];
-    const f = notes[arpStep % notes.length];
-    arpOsc.frequency.cancelScheduledValues(now);
-    arpOsc.frequency.setValueAtTime(f, now);
-    arpGain.gain.cancelScheduledValues(now);
-    arpGain.gain.setValueAtTime(0.0001, now);
-    arpGain.gain.exponentialRampToValueAtTime(0.16, now + 0.008);
-    arpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.10);
-
-    // kick on beats 0,2,4,6 (every other 16th -> 8th notes = "four-on-floor"-ish)
-    const localStep = arpStep % stepsPerChord;
-    if (localStep % 2 === 0) kickOnce();
-    // hi-hat on beats 1,3,5,7 (offbeats)
-    if (localStep % 2 === 1) hatOnce(0.22);
-    // accent hat on 7 (end of bar)
-    if (localStep === 7) hatOnce(0.32);
-
-    // bass octave-bounce: alternate root and root*2 every step
-    if (localStep === 0 || localStep === 4) {
-      bass.frequency.setTargetAtTime(chord.root, now, 0.01);
-    } else if (localStep === 2 || localStep === 6) {
-      bass.frequency.setTargetAtTime(chord.root * 2, now, 0.01);
-    }
-
-    arpStep++;
-    if (arpStep % stepsPerChord === 0) {
-      chordIdx = (chordIdx + 1) % progression.length;
-      const next = progression[chordIdx];
-      bass.frequency.setTargetAtTime(next.root, c.currentTime, 0.04);
-      padOscs.forEach((osc, i) => {
-        osc.frequency.setTargetAtTime(next.chord[i], c.currentTime, 0.25);
-      });
-    }
+    const f = NOTES[step % NOTES.length];
+    bass.frequency.setValueAtTime(f, now);
+    // short stab envelope per beat
+    bassGain.gain.cancelScheduledValues(now);
+    bassGain.gain.setValueAtTime(0.0001, now);
+    bassGain.gain.exponentialRampToValueAtTime(0.5, now + 0.01);
+    bassGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+    step++;
   };
 
   tick();
-  musicTimer = setInterval(tick, beatMs);
+  musicTimer = setInterval(tick, stepMs);
 
-  musicNodes = { bass, padOscs, arpOsc, out, padGain, arpGain, bassGain };
+  musicNodes = { bass, bassGain, out };
 }
 
 export function stopMusic() {
@@ -308,9 +171,8 @@ export function stopMusic() {
     clearInterval(musicTimer);
     musicTimer = null;
   }
-  // fade out then stop oscillators
   if (c) {
-    const t = c.currentTime + 0.5;
+    const t = c.currentTime + 0.3;
     musicNodes.out.gain.cancelScheduledValues(c.currentTime);
     musicNodes.out.gain.setValueAtTime(musicNodes.out.gain.value, c.currentTime);
     musicNodes.out.gain.linearRampToValueAtTime(0, t);
@@ -318,12 +180,11 @@ export function stopMusic() {
   setTimeout(() => {
     try {
       musicNodes.bass.stop();
-      musicNodes.arpOsc.stop();
-      musicNodes.padOscs.forEach((o) => o.stop());
     } catch (_e) { /* ignore */ }
     musicNodes = null;
-  }, 600);
+  }, 400);
 }
+
 
 // ===== SFX =====
 export const sfx = {
