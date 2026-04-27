@@ -42,9 +42,9 @@ body {
     flex-direction: column;
     z-index: 0;
     background:
-        radial-gradient(ellipse 80% 55% at 50% 105%, rgba(168, 85, 247, 0.32), transparent 65%),
-        radial-gradient(ellipse 60% 40% at 50% 95%, rgba(124, 58, 237, 0.45), transparent 65%),
-        linear-gradient(180deg, #06020d 0%, #14063a 55%, #2d0a4f 90%, #3b0f6b 100%);
+        radial-gradient(ellipse 80% 55% at 50% 105%, rgba(124, 58, 237, 0.28), transparent 65%),
+        radial-gradient(ellipse 60% 40% at 50% 95%, rgba(76, 29, 149, 0.40), transparent 65%),
+        linear-gradient(180deg, #02000a 0%, #0a0420 50%, #160640 85%, #1f0858 100%);
 }
 
 /* ===== Soft purple horizon glow (replaces synthwave sun) ===== */
@@ -56,8 +56,8 @@ body {
     height: 360px;
     margin-left: -360px;
     border-radius: 50%;
-    background: radial-gradient(ellipse, rgba(192, 132, 252, 0.45) 0%, rgba(124, 58, 237, 0.35) 35%, transparent 70%);
-    filter: blur(20px);
+    background: radial-gradient(ellipse, rgba(168, 85, 247, 0.32) 0%, rgba(76, 29, 149, 0.28) 35%, transparent 70%);
+    filter: blur(28px);
     z-index: -3;
     pointer-events: none;
 }
@@ -80,6 +80,28 @@ body {
     z-index: -3;
     pointer-events: none;
     animation: sw-grid-scroll 5s linear infinite;
+    filter: blur(0.5px);
+}
+
+/* ===== Top-down animated grid layer (visible everywhere) ===== */
+.bg-grid-top {
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(168, 85, 247, 0.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168, 85, 247, 0.10) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at top, #000 25%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at top, #000 25%, transparent 75%);
+    z-index: -3;
+    pointer-events: none;
+    animation: bg-grid-top-pan 14s linear infinite;
+    filter: blur(0.5px);
+}
+
+@keyframes bg-grid-top-pan {
+    from { background-position: 0 0, 0 0; }
+    to   { background-position: 48px 48px, 48px 48px; }
 }
 
 @keyframes sw-grid-scroll {
@@ -110,8 +132,27 @@ body {
     position: fixed;
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-    opacity: 0.05;
+    opacity: 0.10;
     mix-blend-mode: overlay;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* extra fuzz: soft vignette + global blur haze */
+.bg-haze {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 75% 60% at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.bg-fuzz {
+    position: fixed;
+    inset: -20px;
+    backdrop-filter: blur(1.2px);
+    -webkit-backdrop-filter: blur(1.2px);
     z-index: -1;
     pointer-events: none;
 }
@@ -220,11 +261,64 @@ body {
 }
 
 .dr-friend-logo {
-    width: 56px;
-    height: 56px;
+    width: 44px;
+    height: 44px;
     object-fit: contain;
     filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.7));
     image-rendering: pixelated;
+}
+
+/* ===== Header dual-logo treatment (replaces text title) ===== */
+.dr-logo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.dr-npsi-header-logo {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 16px rgba(168, 85, 247, 0.7)) drop-shadow(0 0 6px rgba(192, 132, 252, 0.5));
+}
+
+.dr-logo-anim {
+    will-change: transform, filter, opacity;
+}
+
+.dr-logo-anim--a {
+    animation: logo-float-a 5.5s ease-in-out infinite, logo-pulse 3.2s ease-in-out infinite;
+}
+
+.dr-logo-anim--b {
+    animation: logo-float-b 6.5s ease-in-out infinite, logo-flicker 4.8s steps(40) infinite;
+}
+
+@keyframes logo-float-a {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-3px) rotate(1deg); }
+}
+
+@keyframes logo-float-b {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    33%      { transform: translateY(-2px) translateX(1px); }
+    66%      { transform: translateY(2px) translateX(-1px); }
+}
+
+@keyframes logo-pulse {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.55)); }
+    50%      { filter: drop-shadow(0 0 26px rgba(192, 132, 252, 0.95)) drop-shadow(0 0 8px rgba(216, 180, 254, 0.7)); }
+}
+
+@keyframes logo-flicker {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.65)); }
+    18%      { opacity: 0.92; }
+    37%      { opacity: 1; filter: drop-shadow(0 0 22px rgba(192, 132, 252, 0.85)); }
+    52%      { opacity: 0.88; }
+    71%      { opacity: 1; }
+    86%      { opacity: 0.95; filter: drop-shadow(0 0 18px rgba(216, 180, 254, 0.75)); }
 }
 
 .dr-title-block {
@@ -954,8 +1048,13 @@ body {
     .dr-footer-tag { display: none; }
 }
 
-.app--playing .sw-sun,
+.app--playing .sw-sun {
+    opacity: 0.4;
+}
+/* keep grid + warp animations active during play, just slightly dimmed */
 .app--playing .bg-grid,
-.app--playing .bg-glow {
-    opacity: 0.3;
+.app--playing .bg-grid-top,
+.app--playing .bg-glow,
+.app--playing .warp-streaks {
+    opacity: 0.55;
 }

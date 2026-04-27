@@ -102,8 +102,10 @@ function App() {
       <Toaster position="top-center" theme="dark" />
 
       <div className="bg-grid" aria-hidden="true" />
+      <div className="bg-grid-top" aria-hidden="true" />
       <div className="bg-grain" aria-hidden="true" />
       <div className="bg-glow" aria-hidden="true" />
+      <div className="bg-haze" aria-hidden="true" />
       <div className="sw-sun" aria-hidden="true" />
 
       {/* Warp streaks (hyperspace falling lines) */}
@@ -135,11 +137,16 @@ function App() {
 
       <header className="dr-header" data-testid="dr-header">
         <div className="dr-header-left">
-          <img src={FRIEND_LOGO} alt="friend" className="dr-friend-logo" data-testid="friend-logo" />
-          <div className="dr-title-block">
-            <h1 className="dr-title" data-testid="dr-title">downtime<span className="dr-dot">.</span>raiders</h1>
-            <p className="dr-subtitle">npsi.rocks</p>
-          </div>
+          <a
+            href="https://npsi.rocks/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="dr-logo-link"
+            data-testid="dr-logo-link"
+          >
+            <img src={FRIEND_LOGO} alt="friend" className="dr-friend-logo dr-logo-anim dr-logo-anim--a" data-testid="friend-logo" />
+            <img src={NPSI_LOGO} alt="npsi.rocks" className="dr-npsi-header-logo dr-logo-anim dr-logo-anim--b" data-testid="npsi-header-logo" />
+          </a>
         </div>
         <div className="dr-header-right">
           <button

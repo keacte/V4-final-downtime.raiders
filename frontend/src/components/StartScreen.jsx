@@ -13,7 +13,7 @@ export default function StartScreen({ onStart }) {
     <section className="start-wrap" data-testid="start-screen">
       <span className="start-tag">// FLEET COMMAND BRIEFING</span>
       <h2 className="start-headline">
-        downtime<span className="dr-dot">.</span>rocks
+        downtime<span className="dr-dot">.</span>raiders
       </h2>
       <p className="start-blurb">
         Capsuleer, lock your fittings. Frigates, cruisers and capitals are
