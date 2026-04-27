@@ -31,7 +31,7 @@ body,
 }
 
 body {
-    font-family: "Oxanium", "Space Mono", ui-monospace, monospace;
+    font-family: "Share Tech Mono", "VT323", ui-monospace, monospace;
     overflow-x: hidden;
 }
 
@@ -327,9 +327,10 @@ body {
     line-height: 1;
 }
 
+/* (.dr-title is unused now since we replaced text with logos, but kept for safety) */
 .dr-title {
-    font-family: "Oxanium", monospace;
-    font-weight: 800;
+    font-family: "Audiowide", "Major Mono Display", monospace;
+    font-weight: 400;
     font-size: 28px;
     letter-spacing: 0.06em;
     color: var(--dr-white);
@@ -347,7 +348,7 @@ body {
 
 .dr-subtitle {
     margin: 6px 0 0 0;
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 16px;
     color: var(--dr-purple-glow);
     letter-spacing: 0.1em;
@@ -390,7 +391,7 @@ body {
     padding: 6px 14px;
     border: 1px solid rgba(168, 85, 247, 0.5);
     border-radius: 999px;
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 16px;
     color: var(--dr-white);
     background: rgba(124, 58, 237, 0.18);
@@ -435,7 +436,7 @@ body {
 }
 
 .start-tag {
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     color: var(--dr-purple-glow);
     letter-spacing: 0.4em;
     font-size: 18px;
@@ -444,31 +445,33 @@ body {
 }
 
 .start-headline {
-    font-family: "Oxanium", monospace;
-    font-weight: 800;
+    font-family: "Audiowide", "Major Mono Display", monospace;
+    font-weight: 400;
     font-size: clamp(40px, 7vw, 92px);
-    line-height: 0.95;
-    letter-spacing: -0.01em;
+    line-height: 1;
+    letter-spacing: 0.02em;
     margin: 0;
-    background: linear-gradient(180deg, #ffffff 0%, #e9d5ff 40%, #c084fc 70%, #7c3aed 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.55));
+    color: #ffffff;
+    text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.6),
+        0 0 22px rgba(217, 70, 239, 0.55),
+        0 0 44px rgba(168, 85, 247, 0.45);
+    white-space: nowrap;
 }
 
 .start-headline .dr-dot {
-    background: linear-gradient(180deg, #d8b4fe 0%, #a855f7 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
+    color: var(--dr-purple-glow);
+    text-shadow: 0 0 14px rgba(192, 132, 252, 0.85), 0 0 30px rgba(168, 85, 247, 0.55);
+    -webkit-text-fill-color: currentColor;
 }
+
+.hl-pink   { color: #ec4899; text-shadow: 0 0 8px rgba(236, 72, 153, 0.6); }
+.hl-cyan   { color: #c084fc; text-shadow: 0 0 8px rgba(192, 132, 252, 0.6); }
+.hl-magenta{ color: #d8b4fe; text-shadow: 0 0 8px rgba(216, 180, 254, 0.7); }
 
 .start-blurb {
     max-width: 640px;
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 22px;
     line-height: 1.4;
     color: rgba(255, 255, 255, 0.88);
@@ -486,7 +489,7 @@ body {
     border: none;
     background: linear-gradient(135deg, var(--dr-purple-light), var(--dr-purple));
     color: var(--dr-white);
-    font-family: "Oxanium", monospace;
+    font-family: "Audiowide", "Major Mono Display", monospace;
     font-weight: 800;
     font-size: 18px;
     letter-spacing: 0.18em;
@@ -518,7 +521,7 @@ body {
     border: 1px solid rgba(192, 132, 252, 0.6);
     background: rgba(168, 85, 247, 0.06);
     color: var(--dr-purple-glow);
-    font-family: "Oxanium", monospace;
+    font-family: "Audiowide", "Major Mono Display", monospace;
     font-weight: 700;
     font-size: 16px;
     letter-spacing: 0.18em;
@@ -549,7 +552,7 @@ body {
 }
 
 .start-control {
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 18px;
     color: rgba(255, 255, 255, 0.9);
 }
@@ -576,7 +579,7 @@ body {
     padding: 8px 14px;
     border: 1px solid rgba(168, 85, 247, 0.45);
     border-radius: 999px;
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 16px;
     color: var(--dr-white);
     background: rgba(45, 10, 79, 0.55);
@@ -608,7 +611,7 @@ body {
     padding: 12px 18px;
     border: 1px solid rgba(168, 85, 247, 0.45);
     background: linear-gradient(180deg, rgba(45, 10, 79, 0.5), rgba(13, 4, 32, 0.85));
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     color: var(--dr-white);
     box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
 }
@@ -628,7 +631,7 @@ body {
 }
 
 .hud-value {
-    font-family: "Oxanium", monospace;
+    font-family: "Audiowide", "Major Mono Display", monospace;
     font-weight: 800;
     font-size: 24px;
     margin-top: 4px;
@@ -648,7 +651,7 @@ body {
     gap: 6px;
     padding: 4px 10px;
     border: 1px solid currentColor;
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 16px;
     box-shadow: 0 0 10px currentColor;
 }
@@ -850,7 +853,7 @@ body {
 }
 
 .over-title {
-    font-family: "Oxanium", monospace;
+    font-family: "Audiowide", "Major Mono Display", monospace;
     font-weight: 800;
     font-size: clamp(28px, 5vw, 44px);
     letter-spacing: 0.04em;
@@ -864,7 +867,7 @@ body {
 }
 
 .over-sub {
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 22px;
     color: var(--dr-purple-glow);
     margin: 0 0 28px;
@@ -886,7 +889,7 @@ body {
 }
 
 .over-stat-label {
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     color: var(--dr-purple-glow);
     font-size: 16px;
     letter-spacing: 0.2em;
@@ -894,7 +897,7 @@ body {
 }
 
 .over-stat-value {
-    font-family: "Oxanium", monospace;
+    font-family: "Audiowide", "Major Mono Display", monospace;
     font-weight: 800;
     font-size: 28px;
     color: var(--dr-white);
@@ -914,7 +917,7 @@ body {
     background: rgba(13, 4, 32, 0.8);
     border: 1px solid rgba(168, 85, 247, 0.45);
     color: var(--dr-white);
-    font-family: "Oxanium", monospace;
+    font-family: "Audiowide", "Major Mono Display", monospace;
     font-size: 16px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -951,7 +954,7 @@ body {
 }
 
 .lb-title {
-    font-family: "Oxanium", monospace;
+    font-family: "Audiowide", "Major Mono Display", monospace;
     font-weight: 800;
     font-size: 22px;
     letter-spacing: 0.18em;
@@ -964,7 +967,7 @@ body {
 .lb-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 20px;
     color: var(--dr-white);
 }
@@ -993,7 +996,7 @@ body {
 .lb-empty {
     padding: 24px;
     text-align: center;
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     color: rgba(255, 255, 255, 0.7);
     font-size: 20px;
 }
@@ -1021,7 +1024,7 @@ body {
 }
 
 .dr-footer-label {
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     color: var(--dr-purple-glow);
     letter-spacing: 0.2em;
     font-size: 14px;
@@ -1036,7 +1039,7 @@ body {
 }
 
 .dr-footer-tag {
-    font-family: "VT323", monospace;
+    font-family: "Share Tech Mono", "VT323", monospace;
     font-size: 18px;
     color: var(--dr-white);
     letter-spacing: 0.1em;

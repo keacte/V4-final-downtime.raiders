@@ -16,9 +16,14 @@ export default function StartScreen({ onStart }) {
         downtime<span className="dr-dot">.</span>raiders
       </h2>
       <p className="start-blurb">
-        Capsuleer, lock your fittings. Frigates, cruisers and capitals are
-        warping in hot. Grab power-ups, rack up kills, and don&apos;t get
-        pipebombed. Survive long enough to make the killboard.
+        The server&apos;s down for daily maintenance. While CCP reboots, raid New
+        Eden in your <span className="hl-pink">Rifter</span> across{' '}
+        <span className="hl-cyan">5 escalating waves</span> of frigates, cruisers
+        and capitals &mdash; ending in a{' '}
+        <span className="hl-magenta">Dreadnought boss fight</span>. Loot{' '}
+        <span className="hl-cyan">5 power-ups</span>: Shield, Rapid Fire,
+        Multi-shot, Smart Bomb and Speed. Don&apos;t get pipebombed. Rep the
+        killboard. o7
       </p>
 
       <div className="start-actions">
