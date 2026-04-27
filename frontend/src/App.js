@@ -70,7 +70,7 @@ function App() {
   };
 
   return (
-    <div className="App" data-testid="app-root">
+    <div className={`App ${screen === "playing" ? "app--playing" : ""}`} data-testid="app-root">
       <Toaster position="top-center" theme="dark" />
 
       {/* Background grain + grid */}
@@ -126,6 +126,7 @@ function App() {
           <span className="dr-footer-tag">FLY IT LIKE YOU STOLE IT &middot; o7</span>
         </div>
       </footer>
+      )}
     </div>
   );
 }
