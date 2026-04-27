@@ -70,7 +70,7 @@ function App() {
   };
 
   return (
-    <div className={`App ${screen === "playing" ? "app--playing" : ""}`} data-testid="app-root">
+    <div className={`App ${screen === "playing" ? "app--playing" : ""} ${screen === "start" ? "app--start" : ""} ${screen === "dead" ? "app--dead" : ""}`} data-testid="app-root">
       <Toaster position="top-center" theme="dark" />
 
       {/* Background grain + grid */}

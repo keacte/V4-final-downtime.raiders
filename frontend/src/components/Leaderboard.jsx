@@ -20,28 +20,30 @@ export default function Leaderboard({ scores, onRefresh }) {
           No kills logged. Be the first to undock.
         </div>
       ) : (
-        <table className="lb-table" data-testid="leaderboard-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Pilot</th>
-              <th>Score</th>
-              <th>Wave</th>
-              <th>Kills</th>
-            </tr>
-          </thead>
-          <tbody>
-            {scores.map((s, i) => (
-              <tr key={s.id || i} data-testid={`leaderboard-row-${i}`}>
-                <td>{String(i + 1).padStart(2, "0")}</td>
-                <td>{s.pilot}</td>
-                <td>{(s.score || 0).toLocaleString()}</td>
-                <td>{s.wave || 1}</td>
-                <td>{s.kills || 0}</td>
+        <div className="lb-table-wrap">
+          <table className="lb-table" data-testid="leaderboard-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Pilot</th>
+                <th>Score</th>
+                <th>Wave</th>
+                <th>Kills</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {scores.map((s, i) => (
+                <tr key={s.id || i} data-testid={`leaderboard-row-${i}`}>
+                  <td>{String(i + 1).padStart(2, "0")}</td>
+                  <td>{s.pilot}</td>
+                  <td>{(s.score || 0).toLocaleString()}</td>
+                  <td>{s.wave || 1}</td>
+                  <td>{s.kills || 0}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
