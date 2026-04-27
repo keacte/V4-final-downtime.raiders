@@ -584,6 +584,7 @@ body {
 .dr-footer {
     margin-top: auto;
     padding: 24px 32px;
+    padding-right: 220px; /* keep clear of fixed Emergent badge */
     border-top: 1px solid rgba(168, 85, 247, 0.25);
     display: flex;
     align-items: center;
@@ -591,6 +592,11 @@ body {
     gap: 16px;
     flex-wrap: wrap;
     background: linear-gradient(0deg, rgba(13, 4, 32, 0.7), transparent);
+}
+
+@media (max-width: 720px) {
+    .dr-footer { padding-right: 32px; padding-bottom: 72px; }
+    .dr-footer-tag { display: none; }
 }
 
 .dr-footer-left {
