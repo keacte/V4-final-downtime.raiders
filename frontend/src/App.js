@@ -106,6 +106,33 @@ function App() {
       <div className="bg-glow" aria-hidden="true" />
       <div className="sw-sun" aria-hidden="true" />
 
+      {/* Warp streaks (hyperspace falling lines) */}
+      <div className="warp-streaks" aria-hidden="true">
+        {Array.from({ length: 24 }).map((_, i) => {
+          const left = (i * 5.1) % 100;
+          const heights = [80, 140, 200, 260];
+          const durations = [4, 5, 6, 7, 8];
+          const h = heights[i % heights.length];
+          const d = durations[i % durations.length];
+          const delay = ((i * 0.41) % 5).toFixed(2);
+          return (
+            <span
+              key={i}
+              className="warp-streak"
+              style={{
+                left: `${left}%`,
+                height: `${h}px`,
+                animationDuration: `${d}s`,
+                animationDelay: `${delay}s`,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      <div className="scan-bar" aria-hidden="true" />
+      <div className="crt-flicker" aria-hidden="true" />
+
       <header className="dr-header" data-testid="dr-header">
         <div className="dr-header-left">
           <img src={FRIEND_LOGO} alt="friend" className="dr-friend-logo" data-testid="friend-logo" />
