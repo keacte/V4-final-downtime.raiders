@@ -45,8 +45,7 @@ export default function StartScreen({ onStart, onShowKillboard }) {
           cruisers and capitals &mdash; ending in a{' '}
           <span className="hl-magenta">Dreadnought boss fight</span>. Loot{' '}
           <span className="hl-cyan">5 power-ups</span>: Shield, Rapid Fire,
-          Multi-shot, Smart Bomb and Speed. Don&apos;t get pipebombed. Rep the
-          killboard. o7
+          Multi-shot, Smart Bomb and Speed. Don&apos;t get pipebombed. o7
         </p>
 
         {/* Action buttons */}

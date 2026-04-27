@@ -1,8 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+
+const DEATH_LINES = [
+  "YOU GOT PIPEBOMBED!",
+  "OH NO YOU DIED!",
+  "YOU CLUMSY PILOT!",
+  "F IN CHAT!",
+  "GF'S IN LOCAL! O7",
+];
 
 export default function GameOver({ stats, onSubmit, onRestart, onHome, submitting }) {
   const [pilot, setPilot] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const deathLine = useMemo(
+    () => DEATH_LINES[Math.floor(Math.random() * DEATH_LINES.length)],
+    []
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,7 +26,7 @@ export default function GameOver({ stats, onSubmit, onRestart, onHome, submittin
 
   return (
     <section className="over-wrap" data-testid="game-over-screen">
-      <h2 className="over-title">OH NO &mdash; GOT PIPEBOMBED!</h2>
+      <h2 className="over-title" data-testid="death-line">{deathLine}</h2>
       <p className="over-sub">Better luck next time, capsuleer.</p>
 
       <div className="over-stats" data-testid="game-over-stats">
