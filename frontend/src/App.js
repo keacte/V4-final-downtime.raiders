@@ -7,7 +7,7 @@ import GameOver from "./components/GameOver";
 import Leaderboard from "./components/Leaderboard";
 import { Toaster } from "sonner";
 import { Volume2, VolumeX } from "lucide-react";
-import { sfx, setMuted, isMuted, unlockAudio } from "./lib/sounds";
+import { sfx, setMuted, isMuted, unlockAudio, startMusic, stopMusic } from "./lib/sounds";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -34,6 +34,13 @@ function App() {
   useEffect(() => {
     fetchScores();
   }, [fetchScores]);
+
+  // start/stop music when entering/leaving playing
+  useEffect(() => {
+    if (screen === "playing") startMusic();
+    else stopMusic();
+    return () => stopMusic();
+  }, [screen]);
 
   const toggleMute = () => {
     unlockAudio();
@@ -97,6 +104,7 @@ function App() {
       <div className="bg-grid" aria-hidden="true" />
       <div className="bg-grain" aria-hidden="true" />
       <div className="bg-glow" aria-hidden="true" />
+      <div className="sw-sun" aria-hidden="true" />
 
       <header className="dr-header" data-testid="dr-header">
         <div className="dr-header-left">

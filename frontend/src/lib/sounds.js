@@ -100,6 +100,167 @@ function noise({ duration = 0.2, volume = 0.4, lowpass = 1200, highpass = 0 }) {
   src.stop(c.currentTime + duration + 0.02);
 }
 
+// ===== Synthwave music loop =====
+let musicNodes = null;
+let musicTimer = null;
+
+function makeReverb(c) {
+  const conv = c.createConvolver();
+  const len = c.sampleRate * 1.2;
+  const buf = c.createBuffer(2, len, c.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
+    }
+  }
+  conv.buffer = buf;
+  return conv;
+}
+
+export function startMusic() {
+  const c = getCtx();
+  if (!c) return;
+  if (musicNodes) return; // already playing
+
+  const out = c.createGain();
+  out.gain.value = 0.0;
+  out.connect(masterGain);
+  // fade in
+  out.gain.linearRampToValueAtTime(0.5, c.currentTime + 1.2);
+
+  // reverb send
+  const reverb = makeReverb(c);
+  const wet = c.createGain();
+  wet.gain.value = 0.25;
+  reverb.connect(wet);
+  wet.connect(out);
+
+  // Am - F - C - G  (synthwave staple, A minor)
+  // root frequencies (low octave): A2=110, F2=87.31, C3=130.81, G2=98
+  const progression = [
+    { root: 110.0,  chord: [220.0, 261.63, 329.63] }, // Am
+    { root: 87.31,  chord: [174.61, 220.0,  261.63] }, // F
+    { root: 130.81, chord: [196.0,  261.63, 329.63] }, // C
+    { root: 98.0,   chord: [196.0,  246.94, 293.66] }, // G
+  ];
+
+  // BASS oscillator (continuous, retuned per chord)
+  const bass = c.createOscillator();
+  const bassFilter = c.createBiquadFilter();
+  bassFilter.type = "lowpass";
+  bassFilter.frequency.value = 700;
+  bassFilter.Q.value = 6;
+  const bassGain = c.createGain();
+  bassGain.gain.value = 0.32;
+  bass.type = "sawtooth";
+  bass.frequency.setValueAtTime(progression[0].root, c.currentTime);
+  bass.connect(bassFilter);
+  bassFilter.connect(bassGain);
+  bassGain.connect(out);
+  bass.start();
+
+  // PAD (chord oscillators)
+  const padOscs = [];
+  const padGain = c.createGain();
+  padGain.gain.value = 0.07;
+  const padFilter = c.createBiquadFilter();
+  padFilter.type = "lowpass";
+  padFilter.frequency.value = 1800;
+  padGain.connect(padFilter);
+  padFilter.connect(out);
+  padFilter.connect(reverb); // also send to reverb
+
+  for (let i = 0; i < 3; i++) {
+    const osc = c.createOscillator();
+    osc.type = i === 0 ? "sawtooth" : "triangle";
+    osc.frequency.setValueAtTime(progression[0].chord[i], c.currentTime);
+    // slight detune for analog feel
+    osc.detune.value = (i - 1) * 6;
+    osc.connect(padGain);
+    osc.start();
+    padOscs.push(osc);
+  }
+
+  // LEAD arpeggio (driven by setInterval-ish via setValueAtTime scheduling)
+  const arpGain = c.createGain();
+  arpGain.gain.value = 0.0;
+  const arpFilter = c.createBiquadFilter();
+  arpFilter.type = "lowpass";
+  arpFilter.frequency.value = 2200;
+  arpFilter.Q.value = 4;
+  arpGain.connect(arpFilter);
+  arpFilter.connect(out);
+  arpFilter.connect(reverb);
+
+  const arpOsc = c.createOscillator();
+  arpOsc.type = "square";
+  arpOsc.frequency.value = 440;
+  arpOsc.connect(arpGain);
+  arpOsc.start();
+
+  // Schedule progression: each chord lasts 3.2s; 16th-note arp = 200ms
+  const beatMs = 200;
+  const chordMs = 3200;
+  let chordIdx = 0;
+  let arpStep = 0;
+
+  const tick = () => {
+    if (!musicNodes) return;
+    const now = c.currentTime;
+    const chord = progression[chordIdx];
+    // arp note: cycle root, 5th, root+oct, 3rd
+    const notes = [chord.chord[0], chord.chord[2], chord.chord[1] * 2, chord.chord[1]];
+    const f = notes[arpStep % notes.length];
+    arpOsc.frequency.cancelScheduledValues(now);
+    arpOsc.frequency.setValueAtTime(f, now);
+    arpGain.gain.cancelScheduledValues(now);
+    arpGain.gain.setValueAtTime(0.0001, now);
+    arpGain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+    arpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+    arpStep++;
+    if (arpStep % (chordMs / beatMs) === 0) {
+      chordIdx = (chordIdx + 1) % progression.length;
+      const next = progression[chordIdx];
+      bass.frequency.setTargetAtTime(next.root, c.currentTime, 0.05);
+      padOscs.forEach((osc, i) => {
+        osc.frequency.setTargetAtTime(next.chord[i], c.currentTime, 0.3);
+      });
+    }
+  };
+
+  // first tick immediately
+  tick();
+  musicTimer = setInterval(tick, beatMs);
+
+  musicNodes = { bass, padOscs, arpOsc, out, padGain, arpGain, bassGain };
+}
+
+export function stopMusic() {
+  if (!musicNodes) return;
+  const c = getCtx();
+  if (musicTimer) {
+    clearInterval(musicTimer);
+    musicTimer = null;
+  }
+  // fade out then stop oscillators
+  if (c) {
+    const t = c.currentTime + 0.5;
+    musicNodes.out.gain.cancelScheduledValues(c.currentTime);
+    musicNodes.out.gain.setValueAtTime(musicNodes.out.gain.value, c.currentTime);
+    musicNodes.out.gain.linearRampToValueAtTime(0, t);
+  }
+  setTimeout(() => {
+    try {
+      musicNodes.bass.stop();
+      musicNodes.arpOsc.stop();
+      musicNodes.padOscs.forEach((o) => o.stop());
+    } catch (_e) { /* ignore */ }
+    musicNodes = null;
+  }, 600);
+}
+
 // ===== SFX =====
 export const sfx = {
   shoot() {
