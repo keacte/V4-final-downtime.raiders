@@ -46,7 +46,7 @@ export default function GameOver({ stats, onSubmit, onRestart, onHome, submittin
           />
           <button
             type="submit"
-            className="btn-arcade"
+            className="eve-btn"
             disabled={submitting || !pilot.trim()}
             data-testid="submit-score-btn"
           >
@@ -56,10 +56,10 @@ export default function GameOver({ stats, onSubmit, onRestart, onHome, submittin
       )}
 
       <div className="over-actions">
-        <button type="button" className="btn-arcade" onClick={onRestart} data-testid="restart-btn">
-          ► RE-UNDOCK
+        <button type="button" className="eve-btn" onClick={onRestart} data-testid="restart-btn">
+          RE-UNDOCK
         </button>
-        <button type="button" className="btn-ghost" onClick={onHome} data-testid="home-btn">
+        <button type="button" className="eve-btn eve-btn-pink" onClick={onHome} data-testid="home-btn">
           STATION
         </button>
       </div>

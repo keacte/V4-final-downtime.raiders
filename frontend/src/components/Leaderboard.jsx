@@ -7,7 +7,7 @@ export default function Leaderboard({ scores, onRefresh }) {
         <h3 className="lb-title">// KILLBOARD &middot; TOP 10</h3>
         <button
           type="button"
-          className="btn-ghost"
+          className="eve-btn eve-btn-icon"
           onClick={onRefresh}
           data-testid="refresh-leaderboard-btn"
         >

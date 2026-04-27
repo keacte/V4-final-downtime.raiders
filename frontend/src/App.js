@@ -6,14 +6,11 @@ import StartScreen from "./components/StartScreen";
 import GameOver from "./components/GameOver";
 import Leaderboard from "./components/Leaderboard";
 import { Toaster } from "sonner";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, X } from "lucide-react";
 import { sfx, setMuted, isMuted, unlockAudio, startMusic, stopMusic } from "./lib/sounds";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-
-const FRIEND_LOGO = "https://customer-assets.emergentagent.com/job_767f29fe-abe6-4b75-8be0-f45420e11c5a/artifacts/nrmdvdis_friend.png";
-const NPSI_LOGO = "https://customer-assets.emergentagent.com/job_767f29fe-abe6-4b75-8be0-f45420e11c5a/artifacts/xpqzlet1_NPSI.ROCKS%20OXANIUM.png";
 
 function App() {
   const [screen, setScreen] = useState("start");
@@ -21,6 +18,7 @@ function App() {
   const [scores, setScores] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [muted, setMutedState] = useState(isMuted());
+  const [showKillboard, setShowKillboard] = useState(false);
 
   const fetchScores = useCallback(async () => {
     try {
@@ -35,7 +33,6 @@ function App() {
     fetchScores();
   }, [fetchScores]);
 
-  // start/stop music when entering/leaving playing
   useEffect(() => {
     if (screen === "playing") startMusic();
     else stopMusic();
@@ -53,6 +50,7 @@ function App() {
   const handleStart = () => {
     unlockAudio();
     sfx.click();
+    setShowKillboard(false);
     setScreen("playing");
   };
 
@@ -90,6 +88,39 @@ function App() {
     fetchScores();
   };
 
+  const handleShowKillboard = () => {
+    sfx.click();
+    fetchScores();
+    setShowKillboard(true);
+  };
+
+  const handleHideKillboard = () => {
+    sfx.click();
+    setShowKillboard(false);
+  };
+
+  // Warp streaks generated once
+  const warpStreaks = Array.from({ length: 22 }).map((_, i) => {
+    const left = (i * 5.1) % 100;
+    const heights = [80, 140, 200, 260];
+    const durations = [4, 5, 6, 7, 8];
+    const h = heights[i % heights.length];
+    const d = durations[i % durations.length];
+    const delay = ((i * 0.41) % 5).toFixed(2);
+    return (
+      <span
+        key={i}
+        className="warp-streak"
+        style={{
+          left: `${left}%`,
+          height: `${h}px`,
+          animationDuration: `${d}s`,
+          animationDelay: `${delay}s`,
+        }}
+      />
+    );
+  });
+
   const appClass = [
     "App",
     screen === "playing" ? "app--playing" : "",
@@ -101,78 +132,42 @@ function App() {
     <div className={appClass} data-testid="app-root">
       <Toaster position="top-center" theme="dark" />
 
-      <div className="bg-grid" aria-hidden="true" />
-      <div className="bg-grid-top" aria-hidden="true" />
-      <div className="bg-grain" aria-hidden="true" />
-      <div className="bg-glow" aria-hidden="true" />
-      <div className="bg-haze" aria-hidden="true" />
-      <div className="sw-sun" aria-hidden="true" />
-
-      {/* Warp streaks (hyperspace falling lines) */}
-      <div className="warp-streaks" aria-hidden="true">
-        {Array.from({ length: 24 }).map((_, i) => {
-          const left = (i * 5.1) % 100;
-          const heights = [80, 140, 200, 260];
-          const durations = [4, 5, 6, 7, 8];
-          const h = heights[i % heights.length];
-          const d = durations[i % durations.length];
-          const delay = ((i * 0.41) % 5).toFixed(2);
-          return (
-            <span
-              key={i}
-              className="warp-streak"
-              style={{
-                left: `${left}%`,
-                height: `${h}px`,
-                animationDuration: `${d}s`,
-                animationDelay: `${delay}s`,
-              }}
-            />
-          );
-        })}
-      </div>
-
+      {/* Background layers */}
+      <div className="starfield" aria-hidden="true" />
+      <div className="warp-streaks" aria-hidden="true">{warpStreaks}</div>
+      <div className="sw-grid-floor" aria-hidden="true" />
       <div className="scan-bar" aria-hidden="true" />
+      <div className="crt-scanlines" aria-hidden="true" />
+      <div className="crt-vignette" aria-hidden="true" />
       <div className="crt-flicker" aria-hidden="true" />
 
-      <header className="dr-header" data-testid="dr-header">
-        <div className="dr-header-left">
-          <a
-            href="https://npsi.rocks/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="dr-logo-link"
-            data-testid="dr-logo-link"
-          >
-            <img src={FRIEND_LOGO} alt="friend" className="dr-friend-logo dr-logo-anim dr-logo-anim--a" data-testid="friend-logo" />
-            <img src={NPSI_LOGO} alt="npsi.rocks" className="dr-npsi-header-logo dr-logo-anim dr-logo-anim--b" data-testid="npsi-header-logo" />
-          </a>
-        </div>
-        <div className="dr-header-right">
+      {/* Floating mute button (top-right) */}
+      {screen !== "playing" && (
+        <div className="floating-mute">
           <button
             type="button"
-            className="dr-mute-btn"
+            className="eve-btn eve-btn-icon"
             onClick={toggleMute}
             data-testid="mute-btn"
             aria-label={muted ? "Unmute" : "Mute"}
             title={muted ? "Unmute" : "Mute"}
           >
-            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
           </button>
-          <span className="dr-status">
-            <span className="dr-status-dot" /> NODE STABLE
-          </span>
         </div>
-      </header>
+      )}
 
-      <main className="dr-main">
-        {screen === "start" && (
-          <StartScreen onStart={handleStart} scores={scores} />
-        )}
-        {screen === "playing" && (
+      {/* Screens */}
+      {screen === "start" && (
+        <StartScreen onStart={handleStart} onShowKillboard={handleShowKillboard} />
+      )}
+      {screen === "playing" && (
+        <main className="play-main" data-testid="play-main">
           <Game onDeath={handleDeath} />
-        )}
-        {screen === "dead" && (
+        </main>
+      )}
+      {screen === "dead" && (
+        <main className="dead-main" data-testid="dead-main">
           <GameOver
             stats={finalStats}
             onSubmit={handleSubmit}
@@ -180,25 +175,25 @@ function App() {
             onHome={handleHome}
             submitting={submitting}
           />
-        )}
+        </main>
+      )}
 
-        {screen !== "playing" && (
-          <section className="dr-leaderboard-section" data-testid="leaderboard-section">
+      {/* Killboard modal */}
+      {showKillboard && (
+        <div className="kb-modal" data-testid="kb-modal" onClick={handleHideKillboard}>
+          <div className="kb-panel" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="kb-close"
+              onClick={handleHideKillboard}
+              data-testid="kb-close-btn"
+              aria-label="Close"
+            >
+              <X size={18} />
+            </button>
             <Leaderboard scores={scores} onRefresh={fetchScores} />
-          </section>
-        )}
-      </main>
-
-      {screen !== "playing" && (
-        <footer className="dr-footer" data-testid="dr-footer">
-          <div className="dr-footer-left">
-            <span className="dr-footer-label">A FAN PROJECT BY</span>
-            <img src={NPSI_LOGO} alt="NPSI.ROCKS" className="dr-npsi-logo" data-testid="npsi-logo" />
           </div>
-          <div className="dr-footer-right">
-            <span className="dr-footer-tag">FLY IT LIKE YOU STOLE IT &middot; o7</span>
-          </div>
-        </footer>
+        </div>
       )}
     </div>
   );
