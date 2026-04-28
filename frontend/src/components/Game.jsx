@@ -43,16 +43,16 @@ const ENEMY_TYPES = {
 
 // ----- 10 distinct named waves + final boss -----
 const WAVES = [
-  { label: "RECON",      spawns: [["frigate", 6]] },
-  { label: "SWARM",      spawns: [["frigate", 10]] },
-  { label: "ESCORT",     spawns: [["frigate", 6], ["cruiser", 2]] },
-  { label: "PINCERS",    spawns: [["frigate", 12]] },
-  { label: "HEAVY",      spawns: [["cruiser", 5], ["frigate", 4]] },
-  { label: "CAPITAL DROP", spawns: [["frigate", 6], ["capital", 1]] },
-  { label: "GANG",       spawns: [["cruiser", 8]] },
-  { label: "ARMADA",     spawns: [["cruiser", 6], ["capital", 2]] },
-  { label: "BLACK OPS",  spawns: [["frigate", 8], ["cruiser", 4], ["capital", 1]] },
-  { label: "FLEET",      spawns: [["frigate", 4], ["cruiser", 6], ["capital", 3]] },
+  { label: "FIRST CONTACT",        spawns: [["frigate", 6]] },
+  { label: "SWARM",                spawns: [["frigate", 10]] },
+  { label: "INTRUSION",            spawns: [["frigate", 6], ["cruiser", 2]] },
+  { label: "BARRAGE",              spawns: [["frigate", 12]] },
+  { label: "PHALANX",              spawns: [["cruiser", 5], ["frigate", 4]] },
+  { label: "SKYFALL",              spawns: [["frigate", 6], ["capital", 1]] },
+  { label: "WAVE",                 spawns: [["cruiser", 8]] },
+  { label: "ARMADA",               spawns: [["cruiser", 6], ["capital", 2]] },
+  { label: "ANNIHILATION PROTOCOL",spawns: [["frigate", 8], ["cruiser", 4], ["capital", 1]] },
+  { label: "LAST STAND",           spawns: [["frigate", 4], ["cruiser", 6], ["capital", 3]] },
 ];
 const FINAL_WAVE = WAVES.length + 1; // 11 -> boss
 
