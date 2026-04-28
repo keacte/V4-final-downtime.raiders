@@ -715,6 +715,15 @@ body {
     animation: glitch 1.4s steps(2) infinite;
 }
 
+.over-title--victory {
+    color: var(--neon-cyan);
+    text-shadow:
+        0 0 8px rgba(34, 211, 238, 0.95),
+        0 0 24px rgba(34, 211, 238, 0.6),
+        2px 0 0 rgba(168, 85, 247, 0.5),
+        -2px 0 0 rgba(217, 70, 239, 0.5);
+}
+
 @keyframes glitch {
     0%, 100% { transform: translate(0); }
     25%      { transform: translate(-1px, 1px); }

@@ -41,6 +41,31 @@ const ENEMY_TYPES = {
   },
 };
 
+// ----- 10 distinct named waves + final boss -----
+const WAVES = [
+  { label: "RECON",      spawns: [["frigate", 6]] },
+  { label: "SWARM",      spawns: [["frigate", 10]] },
+  { label: "ESCORT",     spawns: [["frigate", 6], ["cruiser", 2]] },
+  { label: "PINCERS",    spawns: [["frigate", 12]] },
+  { label: "HEAVY",      spawns: [["cruiser", 5], ["frigate", 4]] },
+  { label: "CAPITAL DROP", spawns: [["frigate", 6], ["capital", 1]] },
+  { label: "GANG",       spawns: [["cruiser", 8]] },
+  { label: "ARMADA",     spawns: [["cruiser", 6], ["capital", 2]] },
+  { label: "BLACK OPS",  spawns: [["frigate", 8], ["cruiser", 4], ["capital", 1]] },
+  { label: "FLEET",      spawns: [["frigate", 4], ["cruiser", 6], ["capital", 3]] },
+];
+const FINAL_WAVE = WAVES.length + 1; // 11 -> boss
+
+// ----- Boss (Dreadnought) -----
+const BOSS_DEF = {
+  label: "DREAD",
+  radius: 70,
+  hp: 80,
+  speed: 0.4,
+  score: 5000,
+  color: "#e879f9",
+};
+
 // ----- Power-ups -----
 const POWERUP_DEFS = {
   shield:   { color: "#22d3ee", label: "SHIELD",     duration: 0,    icon: "S" }, // instant
@@ -99,13 +124,19 @@ export default function Game({ onDeath }) {
       wave: 1,
       waveTimer: 0,
       enemiesToSpawn: 0,
+      spawnQueue: [], // queue of enemy types to spawn for current wave
       spawnCooldown: 0,
+      boss: null,
+      bossSpawned: false,
       // active timed powerups: {type, until}
       activePowerups: [],
       gameOver: false,
+      victory: false,
       shake: 0,
       flash: 0,
       paused: false,
+      waveLabel: WAVES[0].label,
+      waveBanner: 90, // frames to show wave banner
     };
   }, []);
 
@@ -156,24 +187,31 @@ export default function Game({ onDeath }) {
     });
     s.enemies = [];
     s.enemyBullets = [];
+    // bomb damages boss for 5 hp
+    if (s.boss) {
+      s.boss.hp -= 5;
+      explode(s, s.boss.x, s.boss.y, s.boss.def.color, 24);
+    }
     syncHud(s);
   };
 
   // ---------- Spawn helpers ----------
-  const spawnEnemy = (s) => {
-    const wave = s.wave;
-    // Composition by wave
-    const roll = Math.random();
-    let type;
-    if (wave < 2) {
-      type = "frigate";
-    } else if (wave < 4) {
-      type = roll < 0.7 ? "frigate" : "cruiser";
-    } else if (wave < 6) {
-      type = roll < 0.55 ? "frigate" : roll < 0.9 ? "cruiser" : "capital";
-    } else {
-      type = roll < 0.45 ? "frigate" : roll < 0.8 ? "cruiser" : "capital";
+  const buildSpawnQueue = (waveIdx) => {
+    const def = WAVES[waveIdx];
+    if (!def) return [];
+    const q = [];
+    def.spawns.forEach(([type, count]) => {
+      for (let i = 0; i < count; i++) q.push(type);
+    });
+    // shuffle so it's not all-same-type-then-other
+    for (let i = q.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q[i], q[j]] = [q[j], q[i]];
     }
+    return q;
+  };
+
+  const spawnEnemyOfType = (s, type) => {
     const def = ENEMY_TYPES[type];
     const x = rand(40, W - 40);
     const y = -30;
@@ -187,6 +225,27 @@ export default function Game({ onDeath }) {
       angle: 0,
       wobble: Math.random() * Math.PI * 2,
     });
+  };
+
+  const spawnBoss = (s) => {
+    s.boss = {
+      x: W / 2,
+      y: -BOSS_DEF.radius,
+      tx: W / 2,           // target x for drift
+      vy: 0.6,
+      hp: BOSS_DEF.hp,
+      maxHp: BOSS_DEF.hp,
+      def: BOSS_DEF,
+      type: "boss",
+      phase: 1,            // 1: spread, 2: aimed burst, 3: aimed + spread
+      angle: 0,
+      fireT: 0,
+      moveT: 0,
+      entered: false,
+    };
+    s.bossSpawned = true;
+    s.flash = 28;
+    s.shake = 14;
   };
 
   const spawnPowerup = (s, x, y) => {
@@ -241,7 +300,10 @@ export default function Game({ onDeath }) {
       score: s.score,
       lives: s.lives,
       wave: s.wave,
+      waveLabel: s.waveLabel || "",
       bombs: s.bombs,
+      bossHp: s.boss ? s.boss.hp : 0,
+      bossMaxHp: s.boss ? s.boss.maxHp : 0,
       activePowerups: s.activePowerups.map((p) => ({
         type: p.type,
         remaining: Math.max(0, p.until - now),
@@ -261,16 +323,37 @@ export default function Game({ onDeath }) {
 
     stateRef.current = initState();
     const s = stateRef.current;
-    s.enemiesToSpawn = 6;
+    // Initialize wave 1
+    s.wave = 1;
+    s.waveLabel = WAVES[0].label;
+    s.spawnQueue = buildSpawnQueue(0);
+    s.spawnCooldown = 30;
+    s.waveBanner = 90;
     let raf;
     let lastSync = 0;
 
     const startWave = () => {
       s.wave += 1;
-      s.enemiesToSpawn = 5 + s.wave * 2;
-      s.spawnCooldown = 60;
-      s.flash = 14;
-      sfx.wave();
+      if (s.wave <= WAVES.length) {
+        const def = WAVES[s.wave - 1];
+        s.waveLabel = def.label;
+        s.spawnQueue = buildSpawnQueue(s.wave - 1);
+        s.spawnCooldown = 60;
+        s.flash = 14;
+        s.waveBanner = 90;
+        sfx.wave();
+      } else if (s.wave === FINAL_WAVE && !s.bossSpawned) {
+        // BOSS WAVE
+        s.waveLabel = "DREADNOUGHT";
+        s.spawnQueue = [];
+        s.flash = 28;
+        s.waveBanner = 120;
+        sfx.wave();
+        sfx.wave();
+        // delay boss spawn for dramatic effect
+        setTimeout(() => { if (!s.gameOver) spawnBoss(s); }, 1400);
+      }
+      syncHud(s);
     };
 
     const update = () => {
@@ -333,16 +416,90 @@ export default function Game({ onDeath }) {
       });
       s.bullets = s.bullets.filter((b) => b.life > 0 && b.y > -20 && b.y < H + 20 && b.x > -20 && b.x < W + 20);
 
-      // enemy spawns
-      if (s.enemiesToSpawn > 0) {
+      // enemy spawns from wave queue
+      if (s.spawnQueue.length > 0) {
         s.spawnCooldown -= 1;
         if (s.spawnCooldown <= 0) {
-          spawnEnemy(s);
-          s.enemiesToSpawn -= 1;
-          s.spawnCooldown = rand(30, 80);
+          const t = s.spawnQueue.shift();
+          spawnEnemyOfType(s, t);
+          s.spawnCooldown = rand(28, 70);
         }
-      } else if (s.enemies.length === 0) {
-        startWave();
+      } else if (s.enemies.length === 0 && !s.boss && !s.gameOver) {
+        if (s.wave < WAVES.length) {
+          startWave();
+        } else if (s.wave === WAVES.length) {
+          // last regular wave cleared -> trigger boss wave
+          startWave();
+        }
+        // if wave === FINAL_WAVE and boss is null and not yet spawned, startWave handles it
+      }
+
+      // ----- Boss update -----
+      if (s.boss) {
+        const b = s.boss;
+        // entry: descend until y reaches ~120
+        if (!b.entered) {
+          b.y += 1.2;
+          if (b.y >= 130) b.entered = true;
+        } else {
+          // drift left/right on a sine
+          b.moveT += 1;
+          b.x = W / 2 + Math.sin(b.moveT * 0.012) * (W / 2 - 110);
+          // phase based on hp
+          const ratio = b.hp / b.maxHp;
+          b.phase = ratio > 0.66 ? 1 : ratio > 0.33 ? 2 : 3;
+          b.fireT += 1;
+          const fireEvery = b.phase === 1 ? 80 : b.phase === 2 ? 55 : 40;
+          if (b.fireT >= fireEvery) {
+            b.fireT = 0;
+            const px = p.x, py = p.y;
+            // attack patterns
+            if (b.phase === 1) {
+              // 5-way spread
+              for (let i = -2; i <= 2; i++) {
+                const a = Math.PI / 2 + i * 0.18;
+                s.enemyBullets.push({
+                  x: b.x, y: b.y + b.def.radius,
+                  vx: Math.cos(a) * 4.5,
+                  vy: Math.sin(a) * 4.5,
+                  r: 5, life: 220,
+                });
+              }
+            } else if (b.phase === 2) {
+              // aimed triple
+              const dx = px - b.x, dy = py - b.y;
+              const len = Math.hypot(dx, dy) || 1;
+              for (let i = -1; i <= 1; i++) {
+                const ang = Math.atan2(dy, dx) + i * 0.18;
+                s.enemyBullets.push({
+                  x: b.x, y: b.y + b.def.radius,
+                  vx: Math.cos(ang) * 5,
+                  vy: Math.sin(ang) * 5,
+                  r: 5, life: 240,
+                });
+              }
+            } else {
+              // chaos: 7-way + aimed
+              for (let i = -3; i <= 3; i++) {
+                const a = Math.PI / 2 + i * 0.16;
+                s.enemyBullets.push({
+                  x: b.x, y: b.y + b.def.radius,
+                  vx: Math.cos(a) * 5.5,
+                  vy: Math.sin(a) * 5.5,
+                  r: 5, life: 240,
+                });
+              }
+              const dx = px - b.x, dy = py - b.y;
+              const len = Math.hypot(dx, dy) || 1;
+              s.enemyBullets.push({
+                x: b.x, y: b.y + b.def.radius,
+                vx: (dx / len) * 7,
+                vy: (dy / len) * 7,
+                r: 6, life: 260,
+              });
+            }
+          }
+        }
       }
 
       // enemies movement & fire
@@ -401,6 +558,40 @@ export default function Game({ onDeath }) {
             break;
           }
         }
+        // bullet -> boss
+        if (s.boss && i < s.bullets.length && s.bullets[i] === b) {
+          const rr = (s.boss.def.radius + b.r) ** 2;
+          if (dist2(b, s.boss) < rr) {
+            s.bullets.splice(i, 1);
+            s.boss.hp -= 1;
+            s.score += 25;
+            explode(s, b.x, b.y, s.boss.def.color, 8);
+            sfx.hit();
+            if (s.boss.hp <= 0) {
+              // BOSS KILLED -> VICTORY
+              s.score += s.boss.def.score;
+              s.kills += 1;
+              explode(s, s.boss.x, s.boss.y, s.boss.def.color, 60);
+              sfx.bigExplode();
+              s.shake = 32;
+              s.flash = 36;
+              const bossX = s.boss.x, bossY = s.boss.y;
+              // chain explosions
+              for (let k = 0; k < 6; k++) {
+                setTimeout(() => {
+                  explode(s, bossX + rand(-50, 50), bossY + rand(-30, 30), "#ffffff", 30);
+                  sfx.explode();
+                }, k * 180);
+              }
+              s.boss = null;
+              s.victory = true;
+              s.gameOver = true;
+              setTimeout(() => {
+                onDeath({ score: s.score, wave: FINAL_WAVE, kills: s.kills, victory: true });
+              }, 1800);
+            }
+          }
+        }
       }
 
       // collisions: enemy bullet -> player
@@ -417,6 +608,14 @@ export default function Game({ onDeath }) {
         if (dist2(en, p) < (en.def.radius + p.r) ** 2) {
           explode(s, en.x, en.y, en.def.color, 22);
           s.enemies.splice(j, 1);
+          hitPlayer(s);
+        }
+      }
+      // boss -> player
+      if (s.boss) {
+        const rr = (s.boss.def.radius + p.r) ** 2;
+        if (dist2(s.boss, p) < rr) {
+          explode(s, p.x, p.y, s.boss.def.color, 22);
           hitPlayer(s);
         }
       }
@@ -556,6 +755,11 @@ export default function Game({ onDeath }) {
         drawEnemy(ctx, en);
       });
 
+      // boss
+      if (s.boss) {
+        drawBoss(ctx, s.boss);
+      }
+
       // bullets (player)
       s.bullets.forEach((b) => {
         ctx.fillStyle = "#ffffff";
@@ -590,12 +794,60 @@ export default function Game({ onDeath }) {
         ctx.fillStyle = "rgba(6, 2, 13, 0.78)";
         ctx.fillRect(0, 0, W, H);
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 48px Oxanium, monospace";
+        ctx.font = "bold 48px Audiowide, monospace";
         ctx.textAlign = "center";
         ctx.fillText("// PAUSED", W / 2, H / 2 - 8);
-        ctx.font = "20px VT323, monospace";
+        ctx.font = "20px 'Share Tech Mono', monospace";
         ctx.fillStyle = "#c084fc";
         ctx.fillText("Press P to resume", W / 2, H / 2 + 28);
+      }
+
+      // wave banner
+      if (s.waveBanner > 0) {
+        s.waveBanner -= 1;
+        const alpha = Math.min(1, s.waveBanner / 20) * (s.waveBanner > 70 ? (90 - s.waveBanner) / 20 : 1);
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+        ctx.textAlign = "center";
+        ctx.font = "16px 'Share Tech Mono', monospace";
+        ctx.fillStyle = "#c084fc";
+        ctx.fillText(
+          s.wave === FINAL_WAVE ? "// FINAL WAVE //" : `// WAVE ${s.wave} //`,
+          W / 2, H / 2 - 30
+        );
+        ctx.font = (s.wave === FINAL_WAVE ? "bold 56px" : "bold 44px") + " Audiowide, monospace";
+        ctx.fillStyle = s.wave === FINAL_WAVE ? "#e879f9" : "#ffffff";
+        ctx.shadowColor = s.wave === FINAL_WAVE ? "#e879f9" : "#a855f7";
+        ctx.shadowBlur = 24;
+        ctx.fillText(s.waveLabel, W / 2, H / 2 + 14);
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      }
+
+      // boss HP bar (top of canvas)
+      if (s.boss) {
+        const bw = W * 0.7;
+        const bh = 14;
+        const bx = (W - bw) / 2;
+        const by = 14;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
+        ctx.fillStyle = "rgba(168, 85, 247, 0.25)";
+        ctx.fillRect(bx, by, bw, bh);
+        const ratio = Math.max(0, s.boss.hp / s.boss.maxHp);
+        const grad = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+        grad.addColorStop(0, "#e879f9");
+        grad.addColorStop(0.5, "#a855f7");
+        grad.addColorStop(1, "#c084fc");
+        ctx.fillStyle = grad;
+        ctx.fillRect(bx, by, bw * ratio, bh);
+        ctx.strokeStyle = "rgba(232, 121, 249, 0.85)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(bx, by, bw, bh);
+        ctx.font = "bold 12px 'Share Tech Mono', monospace";
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.fillText(`DREADNOUGHT  ${Math.ceil(s.boss.hp)} / ${s.boss.maxHp}`, W / 2, by + bh + 14);
       }
     };
 
@@ -624,7 +876,10 @@ export default function Game({ onDeath }) {
         </div>
         <div className="hud-block">
           <div className="hud-label">Wave</div>
-          <div className="hud-value" data-testid="hud-wave">{hud.wave}</div>
+          <div className="hud-value" data-testid="hud-wave">
+            {hud.wave > WAVES.length ? "BOSS" : `${hud.wave}/10`}
+            {hud.waveLabel ? <span style={{ fontSize: 11, marginLeft: 6, color: "#c084fc" }}>{hud.waveLabel}</span> : null}
+          </div>
         </div>
         <div className="hud-block">
           <div className="hud-label">Lives</div>
@@ -765,6 +1020,71 @@ function drawEnemy(ctx, en) {
   ctx.font = "10px VT323, monospace";
   ctx.textAlign = "center";
   ctx.fillText(def.label, 0, def.radius + 12);
+
+  ctx.restore();
+}
+
+
+function drawBoss(ctx, b) {
+  const r = b.def.radius;
+  ctx.save();
+  ctx.translate(b.x, b.y);
+
+  const t = performance.now() / 600;
+  const pulse = 1 + Math.sin(t * 4) * 0.04;
+  ctx.scale(pulse, pulse);
+
+  // outer hull
+  ctx.fillStyle = "#7c3aed";
+  ctx.strokeStyle = "#e879f9";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-r, -r * 0.3);
+  ctx.lineTo(-r * 0.7, -r * 0.85);
+  ctx.lineTo(-r * 0.25, -r);
+  ctx.lineTo(r * 0.25, -r);
+  ctx.lineTo(r * 0.7, -r * 0.85);
+  ctx.lineTo(r, -r * 0.3);
+  ctx.lineTo(r * 0.85, r * 0.5);
+  ctx.lineTo(r * 0.55, r * 0.85);
+  ctx.lineTo(-r * 0.55, r * 0.85);
+  ctx.lineTo(-r * 0.85, r * 0.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // inner core (animated)
+  ctx.save();
+  ctx.rotate(t);
+  ctx.fillStyle = "#e879f9";
+  ctx.shadowColor = "#e879f9";
+  ctx.shadowBlur = 24;
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const rr = i % 2 === 0 ? r * 0.32 : r * 0.18;
+    const x = Math.cos(a) * rr;
+    const y = Math.sin(a) * rr;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.restore();
+
+  // gun barrels
+  ctx.fillStyle = "#a855f7";
+  ctx.fillRect(-r * 0.7, r * 0.6, r * 0.2, r * 0.4);
+  ctx.fillRect(r * 0.5, r * 0.6, r * 0.2, r * 0.4);
+  ctx.fillRect(-r * 0.1, r * 0.7, r * 0.2, r * 0.4);
+
+  // wing detail
+  ctx.strokeStyle = "rgba(255,255,255,0.4)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.5, 0);
+  ctx.lineTo(r * 0.5, 0);
+  ctx.stroke();
 
   ctx.restore();
 }

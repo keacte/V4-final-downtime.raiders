@@ -8,13 +8,20 @@ const DEATH_LINES = [
   "GF'S IN LOCAL! O7",
 ];
 
+const VICTORY_LINES = [
+  "DREADNOUGHT DOWN! GF!",
+  "NEW EDEN IS YOURS! O7",
+  "PIPEBOMB-PROOF PILOT!",
+];
+
 export default function GameOver({ stats, onSubmit, onRestart, onHome, submitting }) {
   const [pilot, setPilot] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const deathLine = useMemo(
-    () => DEATH_LINES[Math.floor(Math.random() * DEATH_LINES.length)],
-    []
-  );
+  const isVictory = !!stats.victory;
+  const headline = useMemo(() => {
+    const pool = isVictory ? VICTORY_LINES : DEATH_LINES;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }, [isVictory]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,8 +33,10 @@ export default function GameOver({ stats, onSubmit, onRestart, onHome, submittin
 
   return (
     <section className="over-wrap" data-testid="game-over-screen">
-      <h2 className="over-title" data-testid="death-line">{deathLine}</h2>
-      <p className="over-sub">Better luck next time, capsuleer.</p>
+      <h2 className={`over-title ${isVictory ? "over-title--victory" : ""}`} data-testid="death-line">{headline}</h2>
+      <p className="over-sub">
+        {isVictory ? "You survived downtime. CCP is back online. o7" : "Better luck next time, capsuleer."}
+      </p>
 
       <div className="over-stats" data-testid="game-over-stats">
         <div className="over-stat">
