@@ -232,4 +232,17 @@ export const sfx = {
   click() {
     tone({ freq: 660, type: "square", duration: 0.05, volume: 0.18 });
   },
+  countdownTick(n) {
+    // 3 → low, 2 → mid, 1 → high — building tension
+    const freqs = { 3: 440, 2: 587, 1: 784 };
+    const f = freqs[n] || 440;
+    tone({ freq: f, type: "square", duration: 0.18, volume: 0.28 });
+    // soft sub-thump for impact
+    tone({ freq: 90, slideTo: 60, type: "sine", duration: 0.12, volume: 0.22 });
+  },
+  countdownGo() {
+    // launch cue — bright rising chime
+    tone({ freq: 880, slideTo: 1320, type: "square", duration: 0.18, volume: 0.32 });
+    setTimeout(() => tone({ freq: 1320, type: "triangle", duration: 0.22, volume: 0.28 }), 60);
+  },
 };

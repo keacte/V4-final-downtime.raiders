@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { sfx } from "../lib/sounds";
 
 const DEATH_LINES = [
   "YOU GOT PIPEBOMBED!",
@@ -36,11 +37,13 @@ export default function GameOver({ stats, onRestart, onHome }) {
   useEffect(() => {
     if (countdown === null) return undefined;
     if (countdown <= 0) {
+      sfx.countdownGo();
       // proceed
       if (transition?.next === "restart") onRestart();
       else if (transition?.next === "home") onHome();
       return undefined;
     }
+    sfx.countdownTick(countdown);
     const t = setTimeout(() => setCountdown((c) => (c === null ? null : c - 1)), 1000);
     return () => clearTimeout(t);
   }, [countdown, transition, onRestart, onHome]);
