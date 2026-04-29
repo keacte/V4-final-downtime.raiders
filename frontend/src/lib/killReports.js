@@ -108,4 +108,112 @@ export const KILL_REPORTS = [
     ],
     loss: ["1x Ship", "All remaining illusions of control"],
   },
+  {
+    victim: "You (predictably)",
+    combat: [
+      ["Pride Lost", "98% (2% in denial)"],
+      ["Dignity Remaining", "Cosmetic only"],
+      ["Situational Awareness", "Briefly available, not used"],
+    ],
+    tactical: [
+      ["Useful Decisions Made", "Classified"],
+      ["Good decisions", "Undocking (jury still out)"],
+      ["Bad decisions", "The rest"],
+    ],
+    strategic: [
+      ["Plan Quality", "Acceptable"],
+      ["Execution Quality", "Unacceptable"],
+    ],
+    loss: ["1x Ship", "1x Reality check"],
+  },
+  {
+    victim: "You (outplayed)",
+    combat: [
+      ["Pride Lost", "Total"],
+      ["Dignity Remaining", "Fragmented across space"],
+      ["Situational Awareness", "Too little, too late"],
+    ],
+    tactical: [
+      ["Useful Decisions Made", "1 (missed opportunity)"],
+      ["Good decisions", "Locking target"],
+      ["Bad decisions", "Staying on grid"],
+    ],
+    strategic: [
+      ["Plan Quality", "Aggressive"],
+      ["Execution Quality", "Brief"],
+    ],
+    loss: ["1x Ship", "1x Overconfidence"],
+  },
+  {
+    victim: "You (in hindsight)",
+    combat: [
+      ["Pride Lost", "Gradual collapse"],
+      ["Dignity Remaining", "Critically low"],
+      ["Situational Awareness", "Misplaced"],
+    ],
+    tactical: [
+      ["Useful Decisions Made", "Pending"],
+      ["Good decisions", "Pressing buttons"],
+      ["Bad decisions", "Pressing the wrong ones"],
+    ],
+    strategic: [
+      ["Plan Quality", "Reasonable"],
+      ["Execution Quality", "Questionable"],
+    ],
+    loss: ["1x Ship", "Several better options (unused)"],
+  },
+  {
+    victim: "You (unfortunately)",
+    combat: [
+      ["Pride Lost", "Efficiently removed"],
+      ["Dignity Remaining", "Not recoverable"],
+      ["Situational Awareness", "Offline"],
+    ],
+    tactical: [
+      ["Useful Decisions Made", "None confirmed"],
+      ["Good decisions", "Logging in"],
+      ["Bad decisions", "Engaging"],
+    ],
+    strategic: [
+      ["Plan Quality", "Sound"],
+      ["Execution Quality", "Unsound"],
+    ],
+    loss: ["1x Ship", "Tactical credibility"],
+  },
+  {
+    victim: "You (caught mid-thought)",
+    combat: [
+      ["Pride Lost", "Immediate"],
+      ["Dignity Remaining", "Nominal"],
+      ["Situational Awareness", "Buffering… failed"],
+    ],
+    tactical: [
+      ["Useful Decisions Made", "Delayed"],
+      ["Good decisions", "Target selection"],
+      ["Bad decisions", "Everything after"],
+    ],
+    strategic: [
+      ["Plan Quality", "Clear"],
+      ["Execution Quality", "Not clear"],
+    ],
+    loss: ["1x Ship", "1x Missed warp"],
+  },
+  {
+    victim: "You (as expected)",
+    combat: [
+      ["Pride Lost", "Heavy"],
+      ["Dignity Remaining", "Superficial"],
+      ["Situational Awareness", "Partial"],
+    ],
+    tactical: [
+      ["Useful Decisions Made", "Rare"],
+      ["Good decisions", "Attempting to tank"],
+      ["Bad decisions", "Believing it worked"],
+    ],
+    strategic: [
+      ["Plan Quality", "Defensive"],
+      ["Execution Quality", "Ineffective"],
+    ],
+    loss: ["1x Ship", "Defensive optimism"],
+  },
 ];
