@@ -261,6 +261,7 @@ export default function Game({ onDeath }) {
 
   const spawnPowerup = (s, x, y) => {
     // Weighted pool. Common buffs repeated; rare drops appear infrequently.
+    const onBossWave = s.wave === FINAL_WAVE;
     const pool = [
       "shield", "shield", "shield", "shield",
       "rapid", "rapid", "rapid", "rapid",
@@ -268,7 +269,8 @@ export default function Game({ onDeath }) {
       "bomb", "bomb", "bomb", "bomb",
       "speed", "speed", "speed", "speed", "speed",
       "life", "life",
-      "cloak", "cloak",
+      // Cloak disabled on the boss wave — boss is too thicc to ghost past.
+      ...(onBossWave ? [] : ["cloak", "cloak"]),
       "invuln",
       "star",
     ];
@@ -331,6 +333,8 @@ export default function Game({ onDeath }) {
   };
 
   const hasWavePowerup = (s, type) => {
+    // Cloak is disabled on the boss wave — boss-grade sensors see through it.
+    if (type === "cloak" && s.wave === FINAL_WAVE) return false;
     return s.wavePowerups.some((p) => p.type === type && s.wave <= p.untilWave);
   };
 

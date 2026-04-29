@@ -63,7 +63,7 @@ const POWERUPS = [
     color: "#a5f3fc",
     name: "Cloak",
     duration: "1 wave",
-    effect: "Total invisibility — enemies can't hit you for the rest of this wave.",
+    effect: "Total invisibility — enemies can't hit you for the rest of this wave. Disabled on the boss wave.",
     flavor: "// Covert ops engaged",
   },
   {
