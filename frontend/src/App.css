@@ -789,11 +789,12 @@ body {
     white-space: nowrap;
 }
 
-.kr-list .kr-key { min-width: 130px; }
+.kr-list .kr-key { min-width: 200px; }
 
 .kr-val {
     color: var(--text-main);
     flex: 1 1 auto;
+    word-break: break-word;
 }
 
 /* Inline (smaller) stat row variant */
