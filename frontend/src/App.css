@@ -626,22 +626,20 @@ body {
     box-shadow: 0 0 10px currentColor;
 }
 
-/* ===== Ship status bars at bottom of canvas: Shield / Armor / Structure ===== */
-.canvas-wrap { position: relative; }
+/* ===== Ship status bars below canvas: Shield / Armor / Structure ===== */
 .ship-status {
-    position: absolute;
-    left: 50%;
-    bottom: 14px;
-    transform: translateX(-50%);
+    flex: 0 0 auto;
+    width: 100%;
     display: flex;
+    justify-content: center;
     gap: 8px;
-    pointer-events: none;
-    z-index: 5;
+    margin-top: 4px;
+    padding: 0 8px;
 }
 .status-bar {
     position: relative;
-    width: clamp(80px, 12vw, 140px);
-    height: 14px;
+    width: clamp(90px, 14vw, 160px);
+    height: 16px;
     border: 1px solid currentColor;
     color: rgba(139, 109, 184, 0.4);
     background: rgba(0, 0, 0, 0.55);
@@ -681,8 +679,8 @@ body {
 }
 
 @media (max-width: 720px) {
-    .ship-status { gap: 5px; bottom: 8px; }
-    .status-bar { height: 12px; }
+    .ship-status { gap: 5px; }
+    .status-bar { height: 13px; }
     .status-bar-label { font-size: 9px; letter-spacing: 0.16em; }
 }
 

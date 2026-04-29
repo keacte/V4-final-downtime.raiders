@@ -794,6 +794,7 @@ export default function Game({ onDeath }) {
       }
 
       // 2) EVE-style ship layers: Shield -> Armor -> Structure
+      //    3 hits total per ship; the hit that depletes Structure also destroys the ship.
       if (p.shield > 0) {
         p.shield -= 1;
         p.invuln = 30;
@@ -814,16 +815,8 @@ export default function Game({ onDeath }) {
         syncHud(s);
         return;
       }
-      if (p.hull > 0) {
-        p.hull -= 1;
-        p.invuln = 30;
-        s.shake = 16;
-        s.flash = 10;
-        explode(s, p.x, p.y, "#ef4444", 22);
-        sfx.hit();
-        syncHud(s);
-        return;
-      }
+      // p.hull > 0 here (3rd hit): pop structure AND destroy ship in one hit.
+      p.hull = 0;
 
       // 3) Ship destroyed — lose a life and respawn with full S/A/H
       s.lives -= 1;
@@ -1120,16 +1113,16 @@ export default function Game({ onDeath }) {
 
       <div className="canvas-wrap">
         <canvas ref={canvasRef} className="game-canvas" data-testid="game-canvas" />
-        <div className="ship-status" data-testid="ship-status" aria-label="Ship status: shield, armor, structure">
-          <div className={`status-bar status-shield ${hud.shield > 0 ? "on" : ""}`} data-testid="sah-shield" title="Shield">
-            <span className="status-bar-label">SHIELD</span>
-          </div>
-          <div className={`status-bar status-armor ${hud.armor > 0 ? "on" : ""}`} data-testid="sah-armor" title="Armor">
-            <span className="status-bar-label">ARMOR</span>
-          </div>
-          <div className={`status-bar status-structure ${hud.hull > 0 ? "on" : ""}`} data-testid="sah-hull" title="Structure">
-            <span className="status-bar-label">STRUCTURE</span>
-          </div>
+      </div>
+      <div className="ship-status" data-testid="ship-status" aria-label="Ship status: shield, armor, structure">
+        <div className={`status-bar status-shield ${hud.shield > 0 ? "on" : ""}`} data-testid="sah-shield" title="Shield">
+          <span className="status-bar-label">SHIELD</span>
+        </div>
+        <div className={`status-bar status-armor ${hud.armor > 0 ? "on" : ""}`} data-testid="sah-armor" title="Armor">
+          <span className="status-bar-label">ARMOR</span>
+        </div>
+        <div className={`status-bar status-structure ${hud.hull > 0 ? "on" : ""}`} data-testid="sah-hull" title="Structure">
+          <span className="status-bar-label">STRUCTURE</span>
         </div>
       </div>
     </div>
