@@ -70,7 +70,7 @@ const BOSS_DEF = {
 // ----- Power-ups -----
 const POWERUP_DEFS = {
   shield:   { color: "#22d3ee", label: "SHIELD",     duration: 0,    icon: "S" }, // instant
-  rapid:    { color: "#facc15", label: "RAPID",      duration: 8000, icon: "R" },
+  rapid:    { color: "#ef4444", label: "RAPID",      duration: 8000, icon: "R" },
   multi:    { color: "#a855f7", label: "MULTI",      duration: 10000, icon: "M" },
   bomb:     { color: "#ffffff", label: "BOMB",       duration: 0,    icon: "B" }, // stockable
   speed:    { color: "#34d399", label: "SPEED",      duration: 8000, icon: "V" },

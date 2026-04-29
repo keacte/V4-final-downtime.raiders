@@ -14,7 +14,7 @@ const POWERUPS = [
   {
     type: "rapid",
     icon: "R",
-    color: "#facc15",
+    color: "#ef4444",
     name: "Rapid Fire",
     duration: "8s",
     effect: "Cycles your guns ~2.4× faster — DPS ramps hard.",
