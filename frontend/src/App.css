@@ -870,6 +870,54 @@ body {
     .over-wrap--wide { padding: 20px; }
 }
 
+/* ===== Shareable Death Card ===== */
+.share-card {
+    position: relative;
+}
+
+/* Export-only brand footer: rendered visually only when capturing.
+   Kept in DOM (not display:none) so html2canvas measures it correctly. */
+.share-brand {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-top: 1px dashed rgba(168, 85, 247, 0.35);
+    font-family: "Audiowide", monospace;
+    letter-spacing: 0.22em;
+    font-size: 13px;
+    text-transform: uppercase;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top-width: 0;
+    transition: none;
+}
+
+.share-card.is-capturing .share-brand {
+    opacity: 1;
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 4px;
+    border-top-width: 1px;
+}
+
+.share-brand-title {
+    color: #fff;
+    text-shadow: 0 0 8px rgba(217, 70, 239, 0.7), 0 0 2px rgba(255,255,255,0.8);
+}
+.share-brand-sep {
+    color: var(--neon-purple-bright);
+}
+.share-brand-url {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.55);
+}
+
 .over-title {
     font-family: "Audiowide", "Major Mono Display", monospace;
     font-size: clamp(28px, 4.5vw, 48px);

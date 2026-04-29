@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import TransitionScreen from "./TransitionScreen";
 import KillReport from "./KillReport";
 import { KILL_REPORTS } from "../lib/killReports";
+import { shareKillCard } from "../lib/shareCard";
 
 const DEATH_LINES = [
   "YOU GOT PIPEBOMBED!",
@@ -19,6 +20,8 @@ const VICTORY_LINES = [
 
 export default function GameOver({ stats, onRestart, onHome }) {
   const [transition, setTransition] = useState(null);
+  const [shareState, setShareState] = useState("idle"); // idle | working | shared | downloaded | error
+  const cardRef = useRef(null);
 
   const isVictory = !!stats.victory;
   const headline = useMemo(() => {
@@ -48,6 +51,29 @@ export default function GameOver({ stats, onRestart, onHome }) {
     });
   };
 
+  const handleShare = async () => {
+    if (shareState === "working" || !cardRef.current) return;
+    setShareState("working");
+    try {
+      const result = await shareKillCard(cardRef.current, {
+        filename: `downtime-raiders-${isVictory ? "victory" : "kill"}-${stats.score}.png`,
+        title: isVictory ? "downtime.raiders — victory!" : "downtime.raiders — got pipebombed!",
+        text: isVictory
+          ? `I took down the Dreadnought in downtime.raiders! Score: ${stats.score} o7 #npsi`
+          : `I got pipebombed in downtime.raiders! Score: ${stats.score} — better luck next time! o7 #npsi`,
+      });
+      if (!result.ok) {
+        setShareState("error");
+      } else {
+        setShareState(result.method === "share" ? "shared" : "downloaded");
+      }
+    } catch (e) {
+      setShareState("error");
+    } finally {
+      setTimeout(() => setShareState("idle"), 2600);
+    }
+  };
+
   if (transition) {
     return (
       <TransitionScreen
@@ -58,27 +84,44 @@ export default function GameOver({ stats, onRestart, onHome }) {
     );
   }
 
+  const shareLabel = {
+    idle: "SHARE KILL",
+    working: "CAPTURING…",
+    shared: "SHARED! O7",
+    downloaded: "SAVED! O7",
+    error: "RETRY",
+  }[shareState];
+
   return (
     <section className="over-wrap over-wrap--wide" data-testid="game-over-screen">
-      <h2 className={`over-title ${isVictory ? "over-title--victory" : ""}`} data-testid="death-line">{headline}</h2>
-      <p className="over-sub">
-        {isVictory ? "You survived downtime. CCP is back online. o7" : "Better luck next time, capsuleer."}
-      </p>
+      <div ref={cardRef} className="share-card" data-testid="share-card">
+        <h2 className={`over-title ${isVictory ? "over-title--victory" : ""}`} data-testid="death-line">{headline}</h2>
+        <p className="over-sub">
+          {isVictory ? "You survived downtime. CCP is back online. o7" : "Better luck next time, capsuleer."}
+        </p>
 
-      {report && <KillReport report={report} />}
+        {report && <KillReport report={report} />}
 
-      <div className="over-stats over-stats--inline" data-testid="game-over-stats">
-        <div className="over-stat">
-          <div className="over-stat-label">Score</div>
-          <div className="over-stat-value" data-testid="final-score">{stats.score.toLocaleString()}</div>
+        <div className="over-stats over-stats--inline" data-testid="game-over-stats">
+          <div className="over-stat">
+            <div className="over-stat-label">Score</div>
+            <div className="over-stat-value" data-testid="final-score">{stats.score.toLocaleString()}</div>
+          </div>
+          <div className="over-stat">
+            <div className="over-stat-label">Wave</div>
+            <div className="over-stat-value" data-testid="final-wave">{stats.wave}</div>
+          </div>
+          <div className="over-stat">
+            <div className="over-stat-label">Kills</div>
+            <div className="over-stat-value" data-testid="final-kills">{stats.kills}</div>
+          </div>
         </div>
-        <div className="over-stat">
-          <div className="over-stat-label">Wave</div>
-          <div className="over-stat-value" data-testid="final-wave">{stats.wave}</div>
-        </div>
-        <div className="over-stat">
-          <div className="over-stat-label">Kills</div>
-          <div className="over-stat-value" data-testid="final-kills">{stats.kills}</div>
+
+        {/* Branding shown only during PNG capture */}
+        <div className="share-brand" aria-hidden="true">
+          <span className="share-brand-title">downtime.raiders</span>
+          <span className="share-brand-sep">//</span>
+          <span className="share-brand-url">NPSI.ROCKS</span>
         </div>
       </div>
 
@@ -94,6 +137,15 @@ export default function GameOver({ stats, onRestart, onHome }) {
           data-testid="restart-btn"
         >
           UNDOCK
+        </button>
+        <button
+          type="button"
+          className="eve-btn eve-btn-cyan"
+          onClick={handleShare}
+          disabled={shareState === "working"}
+          data-testid="share-btn"
+        >
+          {shareLabel}
         </button>
         <button
           type="button"
