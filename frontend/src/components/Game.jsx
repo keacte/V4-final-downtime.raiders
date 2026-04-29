@@ -224,6 +224,11 @@ export default function Game({ onDeath }) {
       hp: def.hp,
       angle: 0,
       wobble: Math.random() * Math.PI * 2,
+      // Frigate burst-fire state: 3-shot burst every 5s
+      // Stagger initial timer so all frigates don't fire simultaneously
+      burstTimer: type === "frigate" ? Math.floor(rand(120, 300)) : 0,
+      burstShotsLeft: 0,
+      burstShotCooldown: 0,
     });
   };
 
@@ -508,6 +513,38 @@ export default function Game({ onDeath }) {
         en.x += en.vx + Math.sin(en.wobble) * 0.5;
         en.y += en.vy;
         if (en.x < en.def.radius || en.x > W - en.def.radius) en.vx *= -1;
+
+        // Frigate 3-shot burst every 5s (only after they're fully on-screen)
+        if (en.type === "frigate" && en.y > 30) {
+          if (en.burstShotsLeft > 0) {
+            en.burstShotCooldown -= 1;
+            if (en.burstShotCooldown <= 0) {
+              const dx = p.x - en.x;
+              const dy = p.y - en.y;
+              const len = Math.hypot(dx, dy) || 1;
+              const sp = 4.5;
+              s.enemyBullets.push({
+                x: en.x,
+                y: en.y + en.def.radius,
+                vx: (dx / len) * sp,
+                vy: (dy / len) * sp,
+                r: 3.5,
+                life: 200,
+              });
+              en.burstShotsLeft -= 1;
+              en.burstShotCooldown = 9; // ~150ms between shots in the burst
+            }
+          } else {
+            en.burstTimer -= 1;
+            if (en.burstTimer <= 0) {
+              en.burstShotsLeft = 3;
+              en.burstShotCooldown = 0; // fire first immediately next frame
+              en.burstTimer = 300; // 5 seconds @ 60fps
+            }
+          }
+        }
+
+        // Cruiser/Capital random aimed fire (existing)
         if (en.def.fireRate > 0 && Math.random() < en.def.fireRate) {
           const dx = p.x - en.x;
           const dy = p.y - en.y;
