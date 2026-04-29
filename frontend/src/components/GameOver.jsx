@@ -1,7 +1,9 @@
 import React, { useMemo, useRef, useState } from "react";
 import TransitionScreen from "./TransitionScreen";
 import KillReport from "./KillReport";
+import FleetReport from "./FleetReport";
 import { KILL_REPORTS } from "../lib/killReports";
+import { FLEET_REPORTS } from "../lib/fleetReports";
 import { shareKillCard } from "../lib/shareCard";
 
 const DEATH_LINES = [
@@ -31,6 +33,10 @@ export default function GameOver({ stats, onRestart, onHome }) {
   const report = useMemo(() => {
     if (isVictory) return null;
     return KILL_REPORTS[Math.floor(Math.random() * KILL_REPORTS.length)];
+  }, [isVictory]);
+  const fleetReport = useMemo(() => {
+    if (!isVictory) return null;
+    return FLEET_REPORTS[Math.floor(Math.random() * FLEET_REPORTS.length)];
   }, [isVictory]);
 
   const handleUndock = () => {
@@ -85,7 +91,7 @@ export default function GameOver({ stats, onRestart, onHome }) {
   }
 
   const shareLabel = {
-    idle: "SHARE KILL",
+    idle: isVictory ? "SHARE FLEET REPORT" : "SHARE KILL",
     working: "CAPTURING…",
     shared: "SHARED! O7",
     downloaded: "SAVED! O7",
@@ -101,6 +107,7 @@ export default function GameOver({ stats, onRestart, onHome }) {
         </p>
 
         {report && <KillReport report={report} />}
+        {fleetReport && <FleetReport report={fleetReport} />}
 
         <div className="over-stats over-stats--inline" data-testid="game-over-stats">
           <div className="over-stat">
