@@ -751,6 +751,7 @@ body {
 
 /* ===== Centered transition message (UNDOCK / STATION click) ===== */
 .transition-screen {
+    position: relative;
     width: 100%;
     height: 100%;
     display: flex;
@@ -759,7 +760,6 @@ body {
     justify-content: center;
     padding: 2rem;
     text-align: center;
-    gap: 28px;
 }
 
 .transition-msg {
@@ -777,6 +777,10 @@ body {
 }
 
 .transition-count {
+    position: absolute;
+    left: 50%;
+    bottom: calc(50% + 90px); /* sits just above the centered message */
+    transform: translateX(-50%);
     font-family: "Audiowide", "Major Mono Display", monospace;
     font-size: clamp(80px, 14vw, 180px);
     color: #fff;

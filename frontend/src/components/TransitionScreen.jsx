@@ -39,12 +39,12 @@ export default function TransitionScreen({ msg, countdown, onComplete }) {
 
   return (
     <section className="transition-screen" data-testid="transition-screen">
-      <p className="transition-msg" data-testid="transition-msg">{msg}</p>
       {countdown && count !== null && count > 0 && (
         <p className="transition-count" key={count} data-testid="transition-count">
           {count}
         </p>
       )}
+      <p className="transition-msg" data-testid="transition-msg">{msg}</p>
     </section>
   );
 }
