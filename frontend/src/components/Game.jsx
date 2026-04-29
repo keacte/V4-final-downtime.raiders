@@ -90,6 +90,9 @@ export default function Game({ onDeath }) {
   const [hud, setHud] = useState({
     score: 0,
     lives: 3,
+    shield: 1,
+    armor: 1,
+    hull: 1,
     wave: 1,
     bombs: 1,
     activePowerups: [],
@@ -110,6 +113,11 @@ export default function Game({ onDeath }) {
         cooldown: 0,
         invuln: 90,
         shieldHp: 0,
+        // EVE-style 3-layer damage model per ship:
+        //   shield (cyan) -> armor (orange) -> hull (red) -> ship destroyed (lose a life)
+        shield: 1,
+        armor: 1,
+        hull: 1,
       },
       bullets: [],
       enemies: [],
@@ -301,6 +309,10 @@ export default function Game({ onDeath }) {
       s.bombs = Math.min(9, s.bombs + 1);
     } else if (type === "life") {
       s.lives = Math.min(9, s.lives + 1);
+      // also fully repair current ship layers — fresh clone, fresh hull
+      s.player.shield = 1;
+      s.player.armor = 1;
+      s.player.hull = 1;
     } else if (def.waveDuration) {
       // wave-based: cloak, invuln, star
       const untilWave = s.wave + def.waveDuration - 1;
@@ -352,6 +364,9 @@ export default function Game({ onDeath }) {
     setHud({
       score: s.score,
       lives: s.lives,
+      shield: s.player.shield,
+      armor: s.player.armor,
+      hull: s.player.hull,
       wave: s.wave,
       waveLabel: s.waveLabel || "",
       bombs: s.bombs,
@@ -766,13 +781,51 @@ export default function Game({ onDeath }) {
       if (p.invuln > 0) return;
       // Cloak / Invuln / Star — total damage immunity
       if (isImmune(s)) return;
+
+      // 1) Power-up overshield absorbs first (cyan ring from SHIELD pickup)
       if (p.shieldHp > 0) {
         p.shieldHp -= 1;
         p.invuln = 40;
         s.shake = 10;
         explode(s, p.x, p.y, "#22d3ee", 18);
+        sfx.hit();
+        syncHud(s);
         return;
       }
+
+      // 2) EVE-style ship layers: Shield -> Armor -> Hull
+      if (p.shield > 0) {
+        p.shield -= 1;
+        p.invuln = 30;
+        s.shake = 8;
+        s.flash = 6;
+        explode(s, p.x, p.y, "#22d3ee", 16);
+        sfx.hit();
+        syncHud(s);
+        return;
+      }
+      if (p.armor > 0) {
+        p.armor -= 1;
+        p.invuln = 30;
+        s.shake = 12;
+        s.flash = 8;
+        explode(s, p.x, p.y, "#f97316", 18);
+        sfx.hit();
+        syncHud(s);
+        return;
+      }
+      if (p.hull > 0) {
+        p.hull -= 1;
+        p.invuln = 30;
+        s.shake = 16;
+        s.flash = 10;
+        explode(s, p.x, p.y, "#ef4444", 22);
+        sfx.hit();
+        syncHud(s);
+        return;
+      }
+
+      // 3) Ship destroyed — lose a life and respawn with full S/A/H
       s.lives -= 1;
       s.shake = 24;
       s.flash = 18;
@@ -782,6 +835,10 @@ export default function Game({ onDeath }) {
       p.y = H * 0.78;
       p.vx = 0;
       p.vy = 0;
+      // restore layers for the new ship
+      p.shield = 1;
+      p.armor = 1;
+      p.hull = 1;
       if (s.lives <= 0) {
         s.gameOver = true;
         sfx.death();
@@ -1036,6 +1093,11 @@ export default function Game({ onDeath }) {
         <div className="hud-block">
           <div className="hud-label">Lives</div>
           <div className="hud-value" data-testid="hud-lives">{"♦".repeat(Math.max(0, hud.lives))}</div>
+          <div className="hud-sah" data-testid="hud-sah" aria-label="Ship status: shield, armor, hull">
+            <span className={`sah-pip sah-s ${hud.shield > 0 ? "on" : ""}`} data-testid="sah-shield" title="Shield">S</span>
+            <span className={`sah-pip sah-a ${hud.armor  > 0 ? "on" : ""}`} data-testid="sah-armor"  title="Armor">A</span>
+            <span className={`sah-pip sah-h ${hud.hull   > 0 ? "on" : ""}`} data-testid="sah-hull"   title="Hull">H</span>
+          </div>
         </div>
         <div className="hud-block">
           <div className="hud-label">Bombs [X]</div>
