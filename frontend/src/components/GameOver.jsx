@@ -1,5 +1,4 @@
-import React, { useMemo } from "react";
-import { toast } from "sonner";
+import React, { useMemo, useState } from "react";
 
 const DEATH_LINES = [
   "YOU GOT PIPEBOMBED!",
@@ -15,12 +14,35 @@ const VICTORY_LINES = [
   "PIPEBOMB-PROOF PILOT!",
 ];
 
+const TRANSITION_MS = 1600;
+
 export default function GameOver({ stats, onRestart, onHome }) {
+  const [transitionMsg, setTransitionMsg] = useState(null);
   const isVictory = !!stats.victory;
   const headline = useMemo(() => {
     const pool = isVictory ? VICTORY_LINES : DEATH_LINES;
     return pool[Math.floor(Math.random() * pool.length)];
   }, [isVictory]);
+
+  const handleUndock = () => {
+    if (transitionMsg) return;
+    setTransitionMsg("Jump clone activated — undocking now!");
+    setTimeout(() => onRestart(), TRANSITION_MS);
+  };
+
+  const handleStation = () => {
+    if (transitionMsg) return;
+    setTransitionMsg("Docking request accepted! Thanks for playing! o7");
+    setTimeout(() => onHome(), TRANSITION_MS);
+  };
+
+  if (transitionMsg) {
+    return (
+      <section className="transition-screen" data-testid="transition-screen">
+        <p className="transition-msg" data-testid="transition-msg">{transitionMsg}</p>
+      </section>
+    );
+  }
 
   return (
     <section className="over-wrap" data-testid="game-over-screen">
@@ -51,10 +73,7 @@ export default function GameOver({ stats, onRestart, onHome }) {
         <button
           type="button"
           className="eve-btn"
-          onClick={() => {
-            toast("Jump clone activated — undocking now!", { duration: 2200 });
-            onRestart();
-          }}
+          onClick={handleUndock}
           data-testid="restart-btn"
         >
           UNDOCK
@@ -62,10 +81,7 @@ export default function GameOver({ stats, onRestart, onHome }) {
         <button
           type="button"
           className="eve-btn eve-btn-pink"
-          onClick={() => {
-            toast("Docking request accepted!", { duration: 2200 });
-            onHome();
-          }}
+          onClick={handleStation}
           data-testid="home-btn"
         >
           STATION
