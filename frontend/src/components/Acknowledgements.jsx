@@ -9,7 +9,7 @@ export default function Acknowledgements({ onBack }) {
     >
       <div className="menu-center glossary-center">
         <h1 className="glossary-title" data-testid="acknowledgements-title">
-          ack<span className="dot">.</span>nowledgements
+          acknowledgements
         </h1>
         <p className="glossary-sub">
           <ScrollText size={14} style={{ display: "inline", verticalAlign: "-2px", marginRight: 6 }} />
