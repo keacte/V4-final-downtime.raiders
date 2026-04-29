@@ -70,10 +70,10 @@ const BOSS_DEF = {
 // ----- Power-ups -----
 const POWERUP_DEFS = {
   shield:   { color: "#22d3ee", label: "SHIELD",     duration: 0,    icon: "S" }, // instant
-  rapid:    { color: "#ef4444", label: "RAPID",      duration: 8000, icon: "R" },
-  multi:    { color: "#a855f7", label: "MULTI",      duration: 10000, icon: "M" },
+  rapid:    { color: "#ef4444", label: "RAPID",      duration: 15000, icon: "R" },
+  multi:    { color: "#a855f7", label: "MULTI",      duration: 15000, icon: "M" },
   bomb:     { color: "#ffffff", label: "BOMB",       duration: 0,    icon: "B" }, // stockable
-  speed:    { color: "#34d399", label: "SPEED",      duration: 8000, icon: "V" },
+  speed:    { color: "#34d399", label: "SPEED",      duration: 15000, icon: "V" },
   life:     { color: "#c084fc", label: "EXTRA LIFE", duration: 0,    icon: "♥" }, // heart (purple)
   // Wave-based powerups (waveDuration = number of waves the buff covers, including pickup wave)
   cloak:    { color: "#a5f3fc", label: "CLOAK",      duration: 0, waveDuration: 1, icon: "C" },
