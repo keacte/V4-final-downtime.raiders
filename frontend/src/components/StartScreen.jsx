@@ -42,7 +42,7 @@ export default function StartScreen({ onStart }) {
           <span className="hl-magenta">Dreadnought boss fight</span>. Loot{' '}
           <span className="hl-cyan">6 power-ups</span>: Shield, Rapid Fire,
           Multi-shot, Smart Bomb, Speed and{' '}
-          <span className="hl-pink">Extra Life</span>. Don&apos;t get pipebombed. o7
+          <span className="hl-magenta">Extra Life</span>. Don&apos;t get pipebombed. o7
         </p>
 
         <div className="menu-actions">

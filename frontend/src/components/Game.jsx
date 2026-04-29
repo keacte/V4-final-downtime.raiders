@@ -73,7 +73,7 @@ const POWERUP_DEFS = {
   multi:    { color: "#a855f7", label: "MULTI",      duration: 10000, icon: "M" },
   bomb:     { color: "#ffffff", label: "BOMB",       duration: 0,    icon: "B" }, // stockable
   speed:    { color: "#34d399", label: "SPEED",      duration: 8000, icon: "V" },
-  life:     { color: "#ff3b6b", label: "EXTRA LIFE", duration: 0,    icon: "♥" }, // heart
+  life:     { color: "#c084fc", label: "EXTRA LIFE", duration: 0,    icon: "♥" }, // heart (purple)
 };
 
 // ----- Helpers -----
