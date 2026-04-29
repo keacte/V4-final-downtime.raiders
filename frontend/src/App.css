@@ -707,6 +707,7 @@ body {
 
 /* ===== Kill Report panel ===== */
 .kill-report {
+    position: relative;
     margin: 6px auto 16px;
     padding: 16px 18px 14px;
     border: 1px solid rgba(168, 85, 247, 0.4);
@@ -720,6 +721,46 @@ body {
     line-height: 1.5;
 }
 
+.kr-target {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 56px;
+    height: 56px;
+    color: var(--neon-pink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.55));
+    animation: kr-target-pulse 2s ease-in-out infinite;
+}
+
+.kr-target-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--neon-pink);
+    animation: kr-target-spin 8s linear infinite;
+}
+
+.kr-target-skull {
+    position: relative;
+    color: #fff;
+    filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.7));
+}
+
+@keyframes kr-target-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes kr-target-pulse {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5)); }
+    50%      { filter: drop-shadow(0 0 18px rgba(236, 72, 153, 0.9)); }
+}
+
 .kr-head {
     display: flex;
     flex-wrap: wrap;
@@ -727,6 +768,7 @@ body {
     align-items: baseline;
     padding-bottom: 8px;
     margin-bottom: 10px;
+    margin-right: 64px; /* reserve room for target icon */
     border-bottom: 1px dashed rgba(168, 85, 247, 0.3);
 }
 

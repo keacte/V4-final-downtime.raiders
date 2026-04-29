@@ -1,4 +1,5 @@
 import React from "react";
+import { Skull, Crosshair } from "lucide-react";
 
 export default function KillReport({ report }) {
   if (!report) return null;
@@ -10,6 +11,11 @@ export default function KillReport({ report }) {
 
   return (
     <div className="kill-report" data-testid="kill-report">
+      <div className="kr-target" aria-hidden="true">
+        <Crosshair className="kr-target-ring" size={56} strokeWidth={1.4} />
+        <Skull className="kr-target-skull" size={26} strokeWidth={2} />
+      </div>
+
       <div className="kr-head">
         <span className="kr-stamp">KILL REPORT</span>
         <span className="kr-line"><span className="kr-key">Victim</span> <span className="kr-val">{report.victim}</span></span>

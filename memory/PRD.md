@@ -1,43 +1,66 @@
-# downtime.raiders — PRD
+# downtime.raiders — Product Requirements
 
 ## Original Problem Statement
-Space combat sim, for an EVE Online website, old-school vibe, when you die it says
-"oh no - got pipebombed! Better luck next time!". Add the supplied logos. Change
-colour palette to more purples. Call it "downtime.raiders" and keep the font colour
-to white. Add some power-ups.
+Build a space combat sim for an EVE Online community website with an old-school arcade vibe.
+- Game Over message: "oh no - got pipebombed! Better luck next time!"
+- Specific branding: `friend.png`, `NPSI.ROCKS` logos
+- Color palette: purples / synthwave
+- Title: **downtime.raiders**
+- Font color: white
+- Power-ups required
 
-## User Choices (confirmed)
-- Top-down arcade shooter (Asteroids/Galaga vibe)
-- All 5 power-ups: Shield, Rapid Fire, Multi-shot, Smart Bomb, Speed
-- Both leaderboard (MongoDB) + local play
-- Multiple enemy types: Frigate / Cruiser / Capital (EVE-flavored)
-- friend.png in header, NPSI.ROCKS in footer
+## Tech Stack
+- **Frontend**: React, HTML5 Canvas, Web Audio API, CSS keyframe animations (CRT, warp streaks, perspective grid)
+- **Backend**: FastAPI (minimal — `/api/` health check only)
+- **DB**: MongoDB present but unused (Leaderboard removed per user request)
 
 ## Architecture
-- FastAPI backend (`/api/scores` POST + GET) on :8001
-- MongoDB `scores` collection (uuid id, pilot, score, wave, kills, timestamp ISO)
-- React frontend (CRA) with canvas-based game loop in Game.jsx
-- Sonner toaster mounted, Oxanium + VT323 Google Fonts
-- Purple/black palette, white text, CRT scanline overlay on canvas
+```
+/app/
+├── backend/server.py            # Health check only
+└── frontend/src/
+    ├── App.js / App.css          # Layout, CRT/synth styling
+    ├── components/
+    │   ├── Game.jsx              # Canvas game loop, waves, boss, power-ups
+    │   ├── StartScreen.jsx       # Briefing & UNDOCK
+    │   ├── GameOver.jsx          # Pipebomb death screen wrapper
+    │   ├── KillReport.jsx        # EVE-style 3-column kill report + skull/target SVG
+    │   └── TransitionScreen.jsx  # 3-2-1 countdown
+    └── lib/
+        ├── sounds.js             # Web Audio API SFX + bass loop
+        └── killReports.js        # 12 joke kill report templates
+```
 
-## Implemented (2026-02)
-- Start screen: title, briefing, undock CTA, controls, power-up legend
-- Canvas game: player ship, 3 enemy types, bullets, enemy bullets, particles,
-  CRT scanlines, screen shake, flash, parallax stars, wave system
-- Power-ups: shield (2-hit), rapid (8s), multi-shot (10s), bomb (stockable), speed (8s)
-- Smart bomb [X] clears screen
-- Pause [P]
-- Game-over screen with "OH NO — GOT PIPEBOMBED! Better luck next time, capsuleer."
-- Pilot-name submit form -> POST /api/scores
-- Killboard top-10 with refresh
+## Implemented (Feb 2026)
+- ✅ Top-down 2D space shooter (React Canvas, requestAnimationFrame)
+- ✅ Responsive viewport fit (no scrolling) for desktop & mobile
+- ✅ Synthwave purple palette + CRT scanlines + warp streaks + perspective grid
+- ✅ Audiowide (headers, white core + magenta/purple glow) + Share Tech Mono (body)
+- ✅ Branding: `friend.png`, `NPSI.ROCKS` logos integrated
+- ✅ 10 named enemy waves + Wave 11 Dreadnought boss
+- ✅ 6 power-ups including Extra Life heart
+- ✅ Retro Web Audio API SFX + Space Invaders-style descending bass loop
+- ✅ Transition screens with 3-2-1 countdown + audio chimes
+- ✅ EVE-style randomized Kill Report (12 templates, 3-column flex layout)
+- ✅ Target + skull SVG icon in top-right of Kill Report
+- ✅ "oh no - got pipebombed!" death message
 
-## Test Status
-- iteration_1.json: backend 100%, frontend 100%, only cosmetic footer fix applied
+## Removed (intentional, do not re-add)
+- ❌ Leaderboard / Killboard UI + backend API + Mongo schema
+- ❌ Glitch/VHS slip CSS animations on transition screens (rolled back)
 
-## Backlog (P1 / P2)
-- P1: Sound effects (laser zap, explosion, power-up chime) + retro chiptune
-- P1: Touch controls / virtual joystick for mobile
-- P2: Boss waves every 5th wave (titan-class)
-- P2: Player ship cosmetic skins unlocked by score thresholds
-- P2: Daily downtime tournament (24h leaderboard reset)
-- P2: Share-to-X "I scored X on downtime.raiders o7"
+## Backlog / Ideas (none requested)
+- Refactor `Game.jsx` (1100+ lines) into entity classes/hooks if extending
+- Optional: persistence of high scores (would require Mongo re-integration)
+
+## Critical Style Rules
+- Headers: Audiowide, white core, layered magenta/purple text-shadow
+- Body: Share Tech Mono
+- Background must remain purple/dark with CRT/warp streaks
+- Web Audio context unlocks on user gesture (UNDOCK click)
+
+## Test Credentials
+N/A — no auth in this app.
+
+## Status
+Stable. All explicit user requests fulfilled. Last visual verification (skull/target SVG placement) skipped per user instruction.
