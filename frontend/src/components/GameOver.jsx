@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { toast } from "sonner";
 
 const DEATH_LINES = [
   "YOU GOT PIPEBOMBED!",
@@ -27,6 +28,9 @@ export default function GameOver({ stats, onRestart, onHome }) {
       <p className="over-sub">
         {isVictory ? "You survived downtime. CCP is back online. o7" : "Better luck next time, capsuleer."}
       </p>
+      <p className="over-prompt" data-testid="over-prompt">
+        Have you got time for another round?
+      </p>
 
       <div className="over-stats" data-testid="game-over-stats">
         <div className="over-stat">
@@ -44,10 +48,26 @@ export default function GameOver({ stats, onRestart, onHome }) {
       </div>
 
       <div className="over-actions">
-        <button type="button" className="eve-btn" onClick={onRestart} data-testid="restart-btn">
-          RE-UNDOCK
+        <button
+          type="button"
+          className="eve-btn"
+          onClick={() => {
+            toast("Jump clone activated — undocking now!", { duration: 2200 });
+            onRestart();
+          }}
+          data-testid="restart-btn"
+        >
+          UNDOCK
         </button>
-        <button type="button" className="eve-btn eve-btn-pink" onClick={onHome} data-testid="home-btn">
+        <button
+          type="button"
+          className="eve-btn eve-btn-pink"
+          onClick={() => {
+            toast("Docking request accepted!", { duration: 2200 });
+            onHome();
+          }}
+          data-testid="home-btn"
+        >
           STATION
         </button>
       </div>
