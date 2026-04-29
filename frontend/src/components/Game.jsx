@@ -614,6 +614,7 @@ export default function Game({ onDeath }) {
               s.kills += 1;
               explode(s, s.boss.x, s.boss.y, s.boss.def.color, 60);
               sfx.bigExplode();
+              sfx.victory();
               s.shake = 32;
               s.flash = 36;
               const bossX = s.boss.x, bossY = s.boss.y;
@@ -629,7 +630,7 @@ export default function Game({ onDeath }) {
               s.gameOver = true;
               setTimeout(() => {
                 onDeath({ score: s.score, wave: FINAL_WAVE, kills: s.kills, victory: true });
-              }, 1800);
+              }, 2500);
             }
           }
         }

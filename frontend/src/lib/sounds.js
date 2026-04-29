@@ -245,4 +245,38 @@ export const sfx = {
     tone({ freq: 880, slideTo: 1320, type: "square", duration: 0.18, volume: 0.32 });
     setTimeout(() => tone({ freq: 1320, type: "triangle", duration: 0.22, volume: 0.28 }), 60);
   },
+  victory() {
+    // ~2.8s triumphant arcade fanfare: ascending major arpeggios into a held chord.
+    if (muted) return;
+    // Rising arpeggio 1: C major (C5 E5 G5)
+    const arp1 = [523, 659, 784];
+    arp1.forEach((f, i) => {
+      setTimeout(() => tone({ freq: f, type: "square", duration: 0.12, volume: 0.26 }), i * 90);
+    });
+    // Rising arpeggio 2: D minor-ish (D5 F5 A5)
+    const arp2 = [587, 698, 880];
+    arp2.forEach((f, i) => {
+      setTimeout(() => tone({ freq: f, type: "square", duration: 0.12, volume: 0.26 }), 320 + i * 90);
+    });
+    // Rising arpeggio 3: G major (G5 B5 D6)
+    const arp3 = [784, 988, 1175];
+    arp3.forEach((f, i) => {
+      setTimeout(() => tone({ freq: f, type: "square", duration: 0.12, volume: 0.28 }), 640 + i * 90);
+    });
+    // Big C major finale stack (C5 E5 G5 C6) held
+    setTimeout(() => {
+      tone({ freq: 523,  type: "square",   duration: 1.2, volume: 0.22, release: 0.3 });
+      tone({ freq: 659,  type: "square",   duration: 1.2, volume: 0.2,  release: 0.3 });
+      tone({ freq: 784,  type: "triangle", duration: 1.2, volume: 0.22, release: 0.3 });
+      tone({ freq: 1047, type: "triangle", duration: 1.2, volume: 0.28, release: 0.3 });
+    }, 980);
+    // Sub thump + cymbal-like noise hit on the downbeat
+    setTimeout(() => {
+      tone({ freq: 110, slideTo: 55, type: "sine", duration: 0.35, volume: 0.3 });
+      noise({ duration: 0.5, volume: 0.2, highpass: 4000 });
+    }, 980);
+    // Sparkle tail
+    setTimeout(() => tone({ freq: 1568, type: "triangle", duration: 0.35, volume: 0.18 }), 2100);
+    setTimeout(() => tone({ freq: 2093, type: "triangle", duration: 0.4,  volume: 0.16 }), 2350);
+  },
 };
