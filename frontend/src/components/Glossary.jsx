@@ -82,7 +82,7 @@ const POWERUPS = [
     name: "Star",
     duration: "3 waves",
     effect: "ULTIMATE: invulnerability + speed + rapid-fire + 7-bullet spread + immediate +3 lives. Lasts 3 waves.",
-    flavor: "// Officer-fit Rifter // pure dakka",
+    flavor: "// Officer-fit Wifter // pure dakka",
     isStar: true,
   },
 ];

@@ -19,7 +19,7 @@ export default function KillReport({ report }) {
       <div className="kr-head">
         <span className="kr-stamp">KILL REPORT</span>
         <span className="kr-line"><span className="kr-key">Victim</span> <span className="kr-val">{report.victim}</span></span>
-        <span className="kr-line"><span className="kr-key">Ship</span> <span className="kr-val">Rifter</span></span>
+        <span className="kr-line"><span className="kr-key">Ship</span> <span className="kr-val">Wifter</span></span>
       </div>
 
       <div className="kr-grid">

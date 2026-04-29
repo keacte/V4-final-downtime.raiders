@@ -36,7 +36,7 @@ export default function StartScreen({ onStart, onShowGlossary }) {
 
         <p className="briefing" data-testid="briefing">
           The server&apos;s down for daily maintenance. While CCP reboots, raid New
-          Eden in your <span className="hl-pink">Rifter</span> across{' '}
+          Eden in your <span className="hl-pink">Wifter</span> across{' '}
           <span className="hl-cyan">10 distinct waves</span> of frigates,
           cruisers and capitals &mdash; ending in a{' '}
           <span className="hl-magenta">Dreadnought boss fight</span>. Loot{' '}
