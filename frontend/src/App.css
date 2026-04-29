@@ -780,7 +780,6 @@ body {
     position: absolute;
     left: 50%;
     bottom: calc(50% + 90px); /* sits just above the centered message */
-    transform: translateX(-50%);
     font-family: "Audiowide", "Major Mono Display", monospace;
     font-size: clamp(80px, 14vw, 180px);
     color: #fff;
@@ -793,15 +792,15 @@ body {
     animation: count-pulse 1s ease-out both;
 }
 
+@keyframes count-pulse {
+    0%   { opacity: 0; transform: translateX(-50%) scale(1.6); filter: blur(8px); }
+    25%  { opacity: 1; transform: translateX(-50%) scale(1);   filter: blur(0); }
+    100% { opacity: 0.4; transform: translateX(-50%) scale(0.92); filter: blur(0); }
+}
+
 @keyframes transition-fade {
     0%   { opacity: 0; transform: translateY(8px) scale(0.97); filter: blur(6px); }
     100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-
-@keyframes count-pulse {
-    0%   { opacity: 0; transform: scale(1.6); filter: blur(8px); }
-    25%  { opacity: 1; transform: scale(1); filter: blur(0); }
-    100% { opacity: 0.4; transform: scale(0.92); filter: blur(0); }
 }
 
 .over-stats {
