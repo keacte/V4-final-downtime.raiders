@@ -537,7 +537,7 @@ export default function Game({ onDeath }) {
           } else {
             en.burstTimer -= 1;
             if (en.burstTimer <= 0) {
-              en.burstShotsLeft = 3;
+              en.burstShotsLeft = 2;
               en.burstShotCooldown = 0; // fire first immediately next frame
               en.burstTimer = 300; // 5 seconds @ 60fps
             }
