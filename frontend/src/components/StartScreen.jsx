@@ -40,9 +40,10 @@ export default function StartScreen({ onStart, onShowGlossary }) {
           <span className="hl-cyan">10 distinct waves</span> of frigates,
           cruisers and capitals &mdash; ending in a{' '}
           <span className="hl-magenta">Dreadnought boss fight</span>. Loot{' '}
-          <span className="hl-cyan">6 power-ups</span>: Shield, Rapid Fire,
-          Multi-shot, Smart Bomb, Speed and{' '}
-          <span className="hl-magenta">Extra Life</span>. Don&apos;t get pipebombed. o7
+          <span className="hl-cyan">9 power-ups</span> including{' '}
+          <span className="hl-magenta">Extra Life</span>, <span className="hl-pink">Cloak</span>,
+          {' '}<span className="hl-magenta">Invulnerability</span> and the rare{' '}
+          <span className="hl-cyan">Star</span> drop. Don&apos;t get pipebombed. o7
         </p>
 
         <div className="menu-actions">

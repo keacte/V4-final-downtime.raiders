@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft, Heart, Star } from "lucide-react";
 
 const POWERUPS = [
   {
@@ -53,9 +53,37 @@ const POWERUPS = [
     color: "#c084fc",
     name: "Extra Life",
     duration: "Instant",
-    effect: "Adds +1 life. Rare drop (~8%).",
+    effect: "Adds +1 life. Rare drop (~7%).",
     flavor: "// Jump clone activated",
     isHeart: true,
+  },
+  {
+    type: "cloak",
+    icon: "C",
+    color: "#a5f3fc",
+    name: "Cloak",
+    duration: "1 wave",
+    effect: "Total invisibility — enemies can't hit you for the rest of this wave.",
+    flavor: "// Covert ops engaged",
+  },
+  {
+    type: "invuln",
+    icon: "I",
+    color: "#fbbf24",
+    name: "Invulnerability",
+    duration: "2 waves",
+    effect: "Zero damage taken from anything for the next 2 waves. Unstoppable.",
+    flavor: "// Ship hardened — Concord on standby",
+  },
+  {
+    type: "star",
+    icon: "★",
+    color: "#fde047",
+    name: "Star",
+    duration: "1 wave",
+    effect: "ULTIMATE: invulnerability + speed + rapid-fire + 7-bullet spread + immediate +3 lives.",
+    flavor: "// Officer-fit Rifter // pure dakka",
+    isStar: true,
   },
 ];
 
@@ -88,6 +116,8 @@ export default function Glossary({ onBack }) {
               >
                 {p.isHeart ? (
                   <Heart size={22} strokeWidth={2.4} fill={p.color} />
+                ) : p.isStar ? (
+                  <Star size={22} strokeWidth={2.4} fill={p.color} />
                 ) : (
                   <span className="glossary-icon-letter">{p.icon}</span>
                 )}

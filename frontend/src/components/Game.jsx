@@ -74,6 +74,10 @@ const POWERUP_DEFS = {
   bomb:     { color: "#ffffff", label: "BOMB",       duration: 0,    icon: "B" }, // stockable
   speed:    { color: "#34d399", label: "SPEED",      duration: 8000, icon: "V" },
   life:     { color: "#c084fc", label: "EXTRA LIFE", duration: 0,    icon: "♥" }, // heart (purple)
+  // Wave-based powerups (waveDuration = number of waves the buff covers, including pickup wave)
+  cloak:    { color: "#a5f3fc", label: "CLOAK",      duration: 0, waveDuration: 1, icon: "C" },
+  invuln:   { color: "#fbbf24", label: "INVULN",     duration: 0, waveDuration: 2, icon: "I" },
+  star:     { color: "#fde047", label: "STAR",       duration: 0, waveDuration: 1, icon: "★" },
 };
 
 // ----- Helpers -----
@@ -89,6 +93,7 @@ export default function Game({ onDeath }) {
     wave: 1,
     bombs: 1,
     activePowerups: [],
+    wavePowerups: [],
   });
   const [paused, setPaused] = useState(false);
 
@@ -129,6 +134,8 @@ export default function Game({ onDeath }) {
       bossSpawned: false,
       // active timed powerups: {type, until}
       activePowerups: [],
+      // wave-based powerups (cloak, invuln, star): {type, untilWave}
+      wavePowerups: [],
       gameOver: false,
       victory: false,
       shake: 0,
@@ -253,9 +260,18 @@ export default function Game({ onDeath }) {
   };
 
   const spawnPowerup = (s, x, y) => {
-    // Weighted pool: heart is rare (8%), others equally common
-    const pool = ["shield", "rapid", "multi", "bomb", "speed", "speed",
-                  "shield", "rapid", "multi", "bomb", "life"];
+    // Weighted pool. Common buffs repeated; rare drops appear infrequently.
+    const pool = [
+      "shield", "shield", "shield", "shield",
+      "rapid", "rapid", "rapid", "rapid",
+      "multi", "multi", "multi", "multi",
+      "bomb", "bomb", "bomb", "bomb",
+      "speed", "speed", "speed", "speed", "speed",
+      "life", "life",
+      "cloak", "cloak",
+      "invuln",
+      "star",
+    ];
     const type = pool[Math.floor(Math.random() * pool.length)];
     s.powerups.push({ x, y, vy: 1.2, type, def: POWERUP_DEFS[type], life: 600 });
   };
@@ -283,6 +299,19 @@ export default function Game({ onDeath }) {
       s.bombs = Math.min(9, s.bombs + 1);
     } else if (type === "life") {
       s.lives = Math.min(9, s.lives + 1);
+    } else if (def.waveDuration) {
+      // wave-based: cloak, invuln, star
+      const untilWave = s.wave + def.waveDuration - 1;
+      const existing = s.wavePowerups.find((p) => p.type === type);
+      if (existing) {
+        existing.untilWave = Math.max(existing.untilWave, untilWave);
+      } else {
+        s.wavePowerups.push({ type, untilWave });
+      }
+      if (type === "star") {
+        // Star also grants +3 lives immediately (capped at 9 to keep HUD tidy)
+        s.lives = Math.min(9, s.lives + 3);
+      }
     } else {
       // timed: rapid, multi, speed
       const now = performance.now();
@@ -301,10 +330,21 @@ export default function Game({ onDeath }) {
     return s.activePowerups.some((p) => p.type === type && p.until > now);
   };
 
+  const hasWavePowerup = (s, type) => {
+    return s.wavePowerups.some((p) => p.type === type && s.wave <= p.untilWave);
+  };
+
+  // Damage immunity: cloak (invisible), invuln (totally immune), star (mario mode)
+  const isImmune = (s) =>
+    hasWavePowerup(s, "cloak") ||
+    hasWavePowerup(s, "invuln") ||
+    hasWavePowerup(s, "star");
+
   // ---------- HUD sync ----------
   const syncHud = (s) => {
     const now = performance.now();
     s.activePowerups = s.activePowerups.filter((p) => p.until > now);
+    s.wavePowerups = s.wavePowerups.filter((p) => s.wave <= p.untilWave);
     setHud({
       score: s.score,
       lives: s.lives,
@@ -316,6 +356,12 @@ export default function Game({ onDeath }) {
       activePowerups: s.activePowerups.map((p) => ({
         type: p.type,
         remaining: Math.max(0, p.until - now),
+        color: POWERUP_DEFS[p.type].color,
+        label: POWERUP_DEFS[p.type].label,
+      })),
+      wavePowerups: s.wavePowerups.map((p) => ({
+        type: p.type,
+        wavesLeft: Math.max(0, p.untilWave - s.wave + 1),
         color: POWERUP_DEFS[p.type].color,
         label: POWERUP_DEFS[p.type].label,
       })),
@@ -344,6 +390,8 @@ export default function Game({ onDeath }) {
 
     const startWave = () => {
       s.wave += 1;
+      // prune expired wave-based powerups now that we're on a new wave
+      s.wavePowerups = s.wavePowerups.filter((p) => s.wave <= p.untilWave);
       if (s.wave <= WAVES.length) {
         const def = WAVES[s.wave - 1];
         s.waveLabel = def.label;
@@ -373,7 +421,8 @@ export default function Game({ onDeath }) {
       const p = s.player;
 
       // input movement
-      const speedMult = hasPowerup(s, "speed") ? 1.42 : 1;
+      const hasStar = hasWavePowerup(s, "star");
+      const speedMult = (hasPowerup(s, "speed") || hasStar) ? 1.42 : 1;
       const accel = 0.7 * speedMult;
       const friction = 0.88;
       if (s.keys["arrowleft"] || s.keys["a"]) p.vx -= accel;
@@ -389,13 +438,21 @@ export default function Game({ onDeath }) {
       if (p.invuln > 0) p.invuln -= 1;
 
       // firing
-      const fireRate = hasPowerup(s, "rapid") ? 5 : 12;
+      const fireRate = (hasPowerup(s, "rapid") || hasStar) ? 5 : 12;
       if (p.cooldown > 0) p.cooldown -= 1;
       if ((s.keys[" "] || s.keys["space"]) && p.cooldown <= 0) {
         p.cooldown = fireRate;
         const multi = hasPowerup(s, "multi");
-        const angles = multi ? [-0.18, -0.06, 0.06, 0.18] : [0];
-        if (multi) angles.push(0); // center too
+        let angles;
+        if (hasStar) {
+          // 7-bullet wide spread
+          angles = [-0.27, -0.18, -0.09, 0, 0.09, 0.18, 0.27];
+        } else if (multi) {
+          // 5-bullet spread (4 outer + center)
+          angles = [-0.18, -0.06, 0, 0.06, 0.18];
+        } else {
+          angles = [0];
+        }
         angles.forEach((a) => {
           s.bullets.push({
             x: p.x + Math.sin(a) * 14,
@@ -406,7 +463,7 @@ export default function Game({ onDeath }) {
             r: 3,
           });
         });
-        if (multi) sfx.shootMulti(); else sfx.shoot();
+        if (hasStar || multi) sfx.shootMulti(); else sfx.shoot();
       }
 
       // stars
@@ -703,6 +760,8 @@ export default function Game({ onDeath }) {
     const hitPlayer = (s) => {
       const p = s.player;
       if (p.invuln > 0) return;
+      // Cloak / Invuln / Star — total damage immunity
+      if (isImmune(s)) return;
       if (p.shieldHp > 0) {
         p.shieldHp -= 1;
         p.invuln = 40;
@@ -794,6 +853,27 @@ export default function Game({ onDeath }) {
           ctx.bezierCurveTo(8, 8, 13, 4, 13, 0);
           ctx.bezierCurveTo(13, 0, 13, -6, 8, -6);
           ctx.bezierCurveTo(3, -6, 0, 2, 0, 5);
+          ctx.closePath();
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        } else if (pu.type === "star") {
+          // pulsing 5-pointed star with rainbow shimmer
+          const pulse = 1 + Math.sin(performance.now() / 130) * 0.14;
+          ctx.scale(pulse, pulse);
+          const hue = (performance.now() / 8) % 360;
+          ctx.fillStyle = `hsl(${hue}, 95%, 65%)`;
+          ctx.shadowColor = pu.def.color;
+          ctx.shadowBlur = 16;
+          ctx.beginPath();
+          const pts = 5, outerR = 9, innerR = 4;
+          for (let i = 0; i < pts * 2; i++) {
+            const r = i % 2 === 0 ? outerR : innerR;
+            const a = (Math.PI * i) / pts - Math.PI / 2;
+            const x = Math.cos(a) * r;
+            const y = Math.sin(a) * r;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
           ctx.closePath();
           ctx.fill();
           ctx.shadowBlur = 0;
@@ -958,13 +1038,22 @@ export default function Game({ onDeath }) {
           <div className="hud-value" data-testid="hud-bombs">{hud.bombs}</div>
         </div>
         <div className="hud-block hud-powerups" data-testid="hud-powerups">
-          {hud.activePowerups.length === 0 ? (
+          {hud.activePowerups.length === 0 && (!hud.wavePowerups || hud.wavePowerups.length === 0) ? (
             <span style={{ fontFamily: "VT323, monospace", color: "rgba(255,255,255,0.4)", fontSize: 18 }}>—</span>
-          ) : hud.activePowerups.map((pp) => (
-            <span key={pp.type} className="hud-pup" style={{ color: pp.color }}>
-              {pp.label} {Math.ceil(pp.remaining / 1000)}s
-            </span>
-          ))}
+          ) : (
+            <>
+              {(hud.wavePowerups || []).map((wp) => (
+                <span key={`w-${wp.type}`} className="hud-pup" style={{ color: wp.color }} data-testid={`hud-wave-${wp.type}`}>
+                  {wp.label} {wp.wavesLeft}w
+                </span>
+              ))}
+              {hud.activePowerups.map((pp) => (
+                <span key={pp.type} className="hud-pup" style={{ color: pp.color }}>
+                  {pp.label} {Math.ceil(pp.remaining / 1000)}s
+                </span>
+              ))}
+            </>
+          )}
         </div>
       </div>
 
@@ -981,8 +1070,20 @@ function drawPlayer(ctx, s) {
   const blink = p.invuln > 0 && Math.floor(p.invuln / 4) % 2 === 0;
   if (blink) return;
 
+  // wave-buff visuals
+  const isWaveActive = (type) =>
+    s.wavePowerups && s.wavePowerups.some((wp) => wp.type === type && s.wave <= wp.untilWave);
+  const hasCloak = isWaveActive("cloak");
+  const hasInvuln = isWaveActive("invuln");
+  const hasStar = isWaveActive("star");
+
   ctx.save();
   ctx.translate(p.x, p.y);
+
+  if (hasCloak) {
+    // shimmering ghostly outline; ship rendered at low alpha
+    ctx.globalAlpha = 0.32 + Math.sin(performance.now() / 90) * 0.08;
+  }
 
   // engine flame
   const flameLen = 8 + Math.random() * 6;
@@ -1014,6 +1115,9 @@ function drawPlayer(ctx, s) {
   ctx.arc(0, -4, 3, 0, Math.PI * 2);
   ctx.fill();
 
+  // restore alpha for buff overlays so they remain bright
+  ctx.globalAlpha = 1;
+
   // shield ring
   if (p.shieldHp > 0) {
     ctx.strokeStyle = "rgba(34, 211, 238, 0.85)";
@@ -1022,6 +1126,52 @@ function drawPlayer(ctx, s) {
     ctx.arc(0, 0, 22 + Math.sin(performance.now() / 120) * 2, 0, Math.PI * 2);
     ctx.stroke();
   }
+
+  // cloak shimmer ring
+  if (hasCloak) {
+    ctx.strokeStyle = "rgba(165, 243, 252, 0.5)";
+    ctx.setLineDash([3, 5]);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, 24, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // invuln gold ring
+  if (hasInvuln) {
+    ctx.strokeStyle = "rgba(251, 191, 36, 0.95)";
+    ctx.shadowColor = "rgba(251, 191, 36, 0.8)";
+    ctx.shadowBlur = 12;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, 26 + Math.sin(performance.now() / 80) * 2, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  // star — rainbow rotating ring + sparkle
+  if (hasStar) {
+    const t = performance.now();
+    const hue = (t / 4) % 360;
+    ctx.strokeStyle = `hsl(${hue}, 95%, 65%)`;
+    ctx.shadowColor = `hsl(${hue}, 95%, 65%)`;
+    ctx.shadowBlur = 18;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, 28 + Math.sin(t / 60) * 3, 0, Math.PI * 2);
+    ctx.stroke();
+    // little sparkles around the ring
+    for (let i = 0; i < 4; i++) {
+      const ang = (t / 250) + (i * Math.PI) / 2;
+      const sx = Math.cos(ang) * 30;
+      const sy = Math.sin(ang) * 30;
+      ctx.fillStyle = `hsl(${(hue + i * 90) % 360}, 95%, 70%)`;
+      ctx.fillRect(sx - 1.5, sy - 1.5, 3, 3);
+    }
+    ctx.shadowBlur = 0;
+  }
+
   ctx.restore();
 }
 
