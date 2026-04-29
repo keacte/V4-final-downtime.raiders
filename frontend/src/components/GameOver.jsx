@@ -67,10 +67,6 @@ export default function GameOver({ stats, onRestart, onHome }) {
 
       {report && <KillReport report={report} />}
 
-      <p className="over-prompt" data-testid="over-prompt">
-        Have you got time for another round?
-      </p>
-
       <div className="over-stats over-stats--inline" data-testid="game-over-stats">
         <div className="over-stat">
           <div className="over-stat-label">Score</div>
@@ -85,6 +81,10 @@ export default function GameOver({ stats, onRestart, onHome }) {
           <div className="over-stat-value" data-testid="final-kills">{stats.kills}</div>
         </div>
       </div>
+
+      <p className="over-prompt" data-testid="over-prompt">
+        Have you got time for another round?
+      </p>
 
       <div className="over-actions">
         <button
