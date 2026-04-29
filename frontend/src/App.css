@@ -714,10 +714,10 @@ body {
     box-shadow: 0 0 24px rgba(168, 85, 247, 0.15) inset;
     text-align: left;
     font-family: "Share Tech Mono", monospace;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-main);
     letter-spacing: 0.04em;
-    line-height: 1.45;
+    line-height: 1.5;
 }
 
 .kr-head {
@@ -754,7 +754,7 @@ body {
 
 .kr-title {
     font-family: "Audiowide", monospace;
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--neon-cyan);
@@ -989,3 +989,4 @@ body {
     .menu-controls { font-size: 10px; }
     .floating-mute { top: 0.5rem; right: 0.5rem; }
 }
+
