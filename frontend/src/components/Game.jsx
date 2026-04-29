@@ -793,13 +793,13 @@ export default function Game({ onDeath }) {
         return;
       }
 
-      // 2) EVE-style ship layers: Shield -> Armor -> Hull
+      // 2) EVE-style ship layers: Shield -> Armor -> Structure
       if (p.shield > 0) {
         p.shield -= 1;
         p.invuln = 30;
         s.shake = 8;
         s.flash = 6;
-        explode(s, p.x, p.y, "#22d3ee", 16);
+        explode(s, p.x, p.y, "#22c55e", 16);
         sfx.hit();
         syncHud(s);
         return;
@@ -1093,10 +1093,10 @@ export default function Game({ onDeath }) {
         <div className="hud-block">
           <div className="hud-label">Lives</div>
           <div className="hud-value" data-testid="hud-lives">{"♦".repeat(Math.max(0, hud.lives))}</div>
-          <div className="hud-sah" data-testid="hud-sah" aria-label="Ship status: shield, armor, hull">
-            <span className={`sah-pip sah-s ${hud.shield > 0 ? "on" : ""}`} data-testid="sah-shield" title="Shield">S</span>
-            <span className={`sah-pip sah-a ${hud.armor  > 0 ? "on" : ""}`} data-testid="sah-armor"  title="Armor">A</span>
-            <span className={`sah-pip sah-h ${hud.hull   > 0 ? "on" : ""}`} data-testid="sah-hull"   title="Hull">H</span>
+          <div className="hud-sah" data-testid="hud-sah" aria-label="Ship status: shield, armor, structure">
+            <span className={`sah-bar sah-s ${hud.shield > 0 ? "on" : ""}`} data-testid="sah-shield" title="Shield" aria-label="Shield" />
+            <span className={`sah-bar sah-a ${hud.armor  > 0 ? "on" : ""}`} data-testid="sah-armor"  title="Armor" aria-label="Armor" />
+            <span className={`sah-bar sah-h ${hud.hull   > 0 ? "on" : ""}`} data-testid="sah-hull"   title="Structure" aria-label="Structure" />
           </div>
         </div>
         <div className="hud-block">
