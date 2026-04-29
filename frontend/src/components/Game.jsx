@@ -18,7 +18,7 @@ const ENEMY_TYPES = {
     hp: 1,
     speed: 2.4,
     score: 50,
-    color: "#c084fc",
+    color: "#f87171",  // red
     fireRate: 0,
   },
   cruiser: {
@@ -27,7 +27,7 @@ const ENEMY_TYPES = {
     hp: 3,
     speed: 1.4,
     score: 150,
-    color: "#a855f7",
+    color: "#ef4444",  // red
     fireRate: 0.012,
   },
   capital: {
@@ -36,7 +36,7 @@ const ENEMY_TYPES = {
     hp: 8,
     speed: 0.7,
     score: 500,
-    color: "#7c3aed",
+    color: "#b91c1c",  // dark red
     fireRate: 0.022,
   },
 };
@@ -63,7 +63,7 @@ const BOSS_DEF = {
   hp: 80,
   speed: 0.4,
   score: 5000,
-  color: "#e879f9",
+  color: "#dc2626",  // deep red
 };
 
 // ----- Power-ups -----
@@ -807,10 +807,13 @@ export default function Game({ onDeath }) {
 
       // enemy bullets
       s.enemyBullets.forEach((b) => {
-        ctx.fillStyle = "#e879f9";
+        ctx.fillStyle = "#fca5a5";
+        ctx.shadowColor = "#ef4444";
+        ctx.shadowBlur = 8;
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
         ctx.fill();
+        ctx.shadowBlur = 0;
       });
 
       // enemies
@@ -1053,7 +1056,7 @@ function drawEnemy(ctx, en) {
   } else {
     // capital
     ctx.fillStyle = def.color;
-    ctx.strokeStyle = "#c084fc";
+    ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(-def.radius, -def.radius * 0.4);
@@ -1074,7 +1077,7 @@ function drawEnemy(ctx, en) {
     const w = def.radius * 2;
     ctx.fillStyle = "rgba(0,0,0,0.6)";
     ctx.fillRect(-w / 2, -def.radius - 10, w, 4);
-    ctx.fillStyle = "#c084fc";
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(-w / 2, -def.radius - 10, (hp / def.hp) * w, 4);
   }
 
@@ -1098,8 +1101,8 @@ function drawBoss(ctx, b) {
   ctx.scale(pulse, pulse);
 
   // outer hull
-  ctx.fillStyle = "#7c3aed";
-  ctx.strokeStyle = "#e879f9";
+  ctx.fillStyle = b.def.color;       // red
+  ctx.strokeStyle = "#ffffff";       // white outline
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.moveTo(-r, -r * 0.3);
@@ -1119,8 +1122,8 @@ function drawBoss(ctx, b) {
   // inner core (animated)
   ctx.save();
   ctx.rotate(t);
-  ctx.fillStyle = "#e879f9";
-  ctx.shadowColor = "#e879f9";
+  ctx.fillStyle = "#fca5a5";
+  ctx.shadowColor = "#ef4444";
   ctx.shadowBlur = 24;
   ctx.beginPath();
   for (let i = 0; i < 6; i++) {
@@ -1136,7 +1139,7 @@ function drawBoss(ctx, b) {
   ctx.restore();
 
   // gun barrels
-  ctx.fillStyle = "#a855f7";
+  ctx.fillStyle = "#7f1d1d";
   ctx.fillRect(-r * 0.7, r * 0.6, r * 0.2, r * 0.4);
   ctx.fillRect(r * 0.5, r * 0.6, r * 0.2, r * 0.4);
   ctx.fillRect(-r * 0.1, r * 0.7, r * 0.2, r * 0.4);
