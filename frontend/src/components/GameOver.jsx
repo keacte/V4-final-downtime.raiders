@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import TransitionScreen from "./TransitionScreen";
+import KillReport from "./KillReport";
+import { KILL_REPORTS } from "../lib/killReports";
 
 const DEATH_LINES = [
   "YOU GOT PIPEBOMBED!",
@@ -22,6 +24,10 @@ export default function GameOver({ stats, onRestart, onHome }) {
   const headline = useMemo(() => {
     const pool = isVictory ? VICTORY_LINES : DEATH_LINES;
     return pool[Math.floor(Math.random() * pool.length)];
+  }, [isVictory]);
+  const report = useMemo(() => {
+    if (isVictory) return null;
+    return KILL_REPORTS[Math.floor(Math.random() * KILL_REPORTS.length)];
   }, [isVictory]);
 
   const handleUndock = () => {
@@ -53,16 +59,19 @@ export default function GameOver({ stats, onRestart, onHome }) {
   }
 
   return (
-    <section className="over-wrap" data-testid="game-over-screen">
+    <section className="over-wrap over-wrap--wide" data-testid="game-over-screen">
       <h2 className={`over-title ${isVictory ? "over-title--victory" : ""}`} data-testid="death-line">{headline}</h2>
       <p className="over-sub">
         {isVictory ? "You survived downtime. CCP is back online. o7" : "Better luck next time, capsuleer."}
       </p>
+
+      {report && <KillReport report={report} />}
+
       <p className="over-prompt" data-testid="over-prompt">
         Have you got time for another round?
       </p>
 
-      <div className="over-stats" data-testid="game-over-stats">
+      <div className="over-stats over-stats--inline" data-testid="game-over-stats">
         <div className="over-stat">
           <div className="over-stat-label">Score</div>
           <div className="over-stat-value" data-testid="final-score">{stats.score.toLocaleString()}</div>

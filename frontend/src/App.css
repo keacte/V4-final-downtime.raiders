@@ -700,6 +700,123 @@ body {
     text-align: center;
 }
 
+.over-wrap--wide {
+    max-width: 880px;
+    padding: 28px 32px;
+}
+
+/* ===== Kill Report panel ===== */
+.kill-report {
+    margin: 6px auto 16px;
+    padding: 16px 18px 14px;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    background: linear-gradient(180deg, rgba(7, 2, 26, 0.85), rgba(18, 6, 52, 0.7));
+    box-shadow: 0 0 24px rgba(168, 85, 247, 0.15) inset;
+    text-align: left;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 12px;
+    color: var(--text-main);
+    letter-spacing: 0.04em;
+    line-height: 1.45;
+}
+
+.kr-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    align-items: baseline;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed rgba(168, 85, 247, 0.3);
+}
+
+.kr-stamp {
+    font-family: "Audiowide", monospace;
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+}
+
+.kr-line {
+    display: inline-flex;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.kr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 22px;
+}
+
+.kr-section { min-width: 0; }
+
+.kr-title {
+    font-family: "Audiowide", monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neon-cyan);
+    margin: 0 0 4px;
+    text-shadow: 0 0 6px rgba(34, 211, 238, 0.45);
+}
+
+.kr-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.kr-list li {
+    display: flex;
+    gap: 8px;
+    padding: 1px 0;
+    line-height: 1.35;
+}
+
+.kr-list li::before {
+    content: "•";
+    color: var(--neon-purple-bright);
+    flex: 0 0 auto;
+}
+
+.kr-list--loss li::before { color: var(--neon-pink); }
+
+.kr-key {
+    color: var(--text-dim);
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.kr-list .kr-key { min-width: 130px; }
+
+.kr-val {
+    color: var(--text-main);
+    flex: 1 1 auto;
+}
+
+/* Inline (smaller) stat row variant */
+.over-stats--inline {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.over-stats--inline .over-stat {
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    padding: 8px 14px;
+    min-width: 100px;
+}
+
+.over-stats--inline .over-stat-value { font-size: 18px; margin-top: 2px; }
+
+@media (max-width: 720px) {
+    .kr-grid { grid-template-columns: 1fr; }
+    .over-wrap--wide { padding: 20px; }
+}
+
 .over-title {
     font-family: "Audiowide", "Major Mono Display", monospace;
     font-size: clamp(28px, 4.5vw, 48px);
