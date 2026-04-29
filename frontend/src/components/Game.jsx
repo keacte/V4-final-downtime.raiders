@@ -309,7 +309,9 @@ export default function Game({ onDeath }) {
     } else if (type === "bomb") {
       s.bombs = Math.min(9, s.bombs + 1);
     } else if (type === "life") {
-      s.lives = Math.min(9, s.lives + 1);
+      // On the boss wave, lives are capped at 5; otherwise capped at 9.
+      const cap = s.wave === FINAL_WAVE ? 5 : 9;
+      s.lives = Math.min(cap, s.lives + 1);
       // also fully repair current ship layers — fresh clone, fresh hull
       s.player.shield = 1;
       s.player.armor = 1;
@@ -324,8 +326,9 @@ export default function Game({ onDeath }) {
         s.wavePowerups.push({ type, untilWave });
       }
       if (type === "star") {
-        // Star also grants +3 lives immediately (capped at 9 to keep HUD tidy)
-        s.lives = Math.min(9, s.lives + 3);
+        // Star also grants +3 lives immediately (capped: 5 on boss wave, 9 elsewhere)
+        const cap = s.wave === FINAL_WAVE ? 5 : 9;
+        s.lives = Math.min(cap, s.lives + 3);
       }
     } else {
       // timed: rapid, multi, speed
@@ -421,7 +424,8 @@ export default function Game({ onDeath }) {
         s.waveBanner = 90;
         sfx.wave();
       } else if (s.wave === FINAL_WAVE && !s.bossSpawned) {
-        // BOSS WAVE
+        // BOSS WAVE — cap lives at 5 to keep the fight tense.
+        if (s.lives > 5) s.lives = 5;
         s.waveLabel = "DREADNOUGHT";
         s.spawnQueue = [];
         s.flash = 28;
