@@ -39,6 +39,10 @@ function App() {
 
   const handleDeath = (stats) => {
     setFinalStats(stats);
+    setScreen(stats.victory ? "victory" : "dead");
+  };
+
+  const handleVictoryComplete = () => {
     setScreen("dead");
   };
 
@@ -115,6 +119,13 @@ function App() {
           msg="Fly safe Capsuleer — see you on the other side! o7"
           countdown={true}
           onComplete={handleLaunchComplete}
+        />
+      )}
+      {screen === "victory" && (
+        <TransitionScreen
+          msg="Congratulations, you beat the boss! Fly safe! o7"
+          countdown={false}
+          onComplete={handleVictoryComplete}
         />
       )}
       {screen === "playing" && (
