@@ -632,9 +632,21 @@ body {
     width: 100%;
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 8px;
     margin-top: 4px;
     padding: 0 8px;
+}
+.lives-hearts {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-right: 6px;
+}
+.lives-heart {
+    color: #c084fc;
+    fill: #c084fc;
+    filter: drop-shadow(0 0 6px rgba(192, 132, 252, 0.85));
 }
 .status-bar {
     position: relative;

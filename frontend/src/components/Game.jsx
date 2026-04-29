@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { Heart } from "lucide-react";
 import { sfx } from "../lib/sounds";
 
 /**
@@ -1084,10 +1085,6 @@ export default function Game({ onDeath }) {
           </div>
         </div>
         <div className="hud-block">
-          <div className="hud-label">Lives</div>
-          <div className="hud-value" data-testid="hud-lives">{"♦".repeat(Math.max(0, hud.lives))}</div>
-        </div>
-        <div className="hud-block">
           <div className="hud-label">Bombs [X]</div>
           <div className="hud-value" data-testid="hud-bombs">{hud.bombs}</div>
         </div>
@@ -1115,6 +1112,19 @@ export default function Game({ onDeath }) {
         <canvas ref={canvasRef} className="game-canvas" data-testid="game-canvas" />
       </div>
       <div className="ship-status" data-testid="ship-status" aria-label="Ship status: shield, armor, structure">
+        <div className="lives-hearts" data-testid="hud-lives" aria-label={`${hud.lives} lives`}>
+          {Array.from({ length: Math.max(0, hud.lives) }).map((_, i) => (
+            <Heart
+              key={i}
+              size={18}
+              strokeWidth={2.4}
+              className="lives-heart"
+              fill="#c084fc"
+              color="#c084fc"
+              aria-hidden="true"
+            />
+          ))}
+        </div>
         <div className={`status-bar status-shield ${hud.shield > 0 ? "on" : ""}`} data-testid="sah-shield" title="Shield">
           <span className="status-bar-label">SHIELD</span>
         </div>
