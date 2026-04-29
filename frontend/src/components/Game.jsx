@@ -77,7 +77,7 @@ const POWERUP_DEFS = {
   // Wave-based powerups (waveDuration = number of waves the buff covers, including pickup wave)
   cloak:    { color: "#a5f3fc", label: "CLOAK",      duration: 0, waveDuration: 1, icon: "C" },
   invuln:   { color: "#fbbf24", label: "INVULN",     duration: 0, waveDuration: 2, icon: "I" },
-  star:     { color: "#fde047", label: "STAR",       duration: 0, waveDuration: 1, icon: "★" },
+  star:     { color: "#fde047", label: "STAR",       duration: 0, waveDuration: 3, icon: "★" },
 };
 
 // ----- Helpers -----
