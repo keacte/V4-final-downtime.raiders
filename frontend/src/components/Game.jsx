@@ -73,9 +73,8 @@ const POWERUP_DEFS = {
   multi:    { color: "#a855f7", label: "MULTI",      duration: 10000, icon: "M" },
   bomb:     { color: "#ffffff", label: "BOMB",       duration: 0,    icon: "B" }, // stockable
   speed:    { color: "#34d399", label: "SPEED",      duration: 8000, icon: "V" },
+  life:     { color: "#ff3b6b", label: "EXTRA LIFE", duration: 0,    icon: "♥" }, // heart
 };
-
-const POWERUP_KEYS = Object.keys(POWERUP_DEFS);
 
 // ----- Helpers -----
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -254,7 +253,10 @@ export default function Game({ onDeath }) {
   };
 
   const spawnPowerup = (s, x, y) => {
-    const type = POWERUP_KEYS[Math.floor(Math.random() * POWERUP_KEYS.length)];
+    // Weighted pool: heart is rare (8%), others equally common
+    const pool = ["shield", "rapid", "multi", "bomb", "speed", "speed",
+                  "shield", "rapid", "multi", "bomb", "life"];
+    const type = pool[Math.floor(Math.random() * pool.length)];
     s.powerups.push({ x, y, vy: 1.2, type, def: POWERUP_DEFS[type], life: 600 });
   };
 
@@ -279,6 +281,8 @@ export default function Game({ onDeath }) {
       s.player.shieldHp = Math.max(s.player.shieldHp, 2);
     } else if (type === "bomb") {
       s.bombs = Math.min(9, s.bombs + 1);
+    } else if (type === "life") {
+      s.lives = Math.min(9, s.lives + 1);
     } else {
       // timed: rapid, multi, speed
       const now = performance.now();
@@ -771,11 +775,33 @@ export default function Game({ onDeath }) {
         ctx.rect(-12, -12, 24, 24);
         ctx.fill();
         ctx.stroke();
-        ctx.fillStyle = pu.def.color;
-        ctx.font = "bold 14px Oxanium, monospace";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(pu.def.icon, 0, 1);
+
+        if (pu.type === "life") {
+          // pulsing heart shape for extra-life pickup
+          const pulse = 1 + Math.sin(performance.now() / 180) * 0.08;
+          ctx.scale(pulse, pulse);
+          ctx.fillStyle = pu.def.color;
+          ctx.shadowColor = pu.def.color;
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          // heart path centered at (0,0), ~16x14
+          ctx.moveTo(0, 5);
+          ctx.bezierCurveTo(0, 2, -3, -6, -8, -6);
+          ctx.bezierCurveTo(-13, -6, -13, 0, -13, 0);
+          ctx.bezierCurveTo(-13, 4, -8, 8, 0, 8);
+          ctx.bezierCurveTo(8, 8, 13, 4, 13, 0);
+          ctx.bezierCurveTo(13, 0, 13, -6, 8, -6);
+          ctx.bezierCurveTo(3, -6, 0, 2, 0, 5);
+          ctx.closePath();
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = pu.def.color;
+          ctx.font = "bold 14px Audiowide, monospace";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(pu.def.icon, 0, 1);
+        }
         ctx.restore();
       });
 
