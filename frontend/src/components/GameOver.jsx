@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 
 const DEATH_LINES = [
   "YOU GOT PIPEBOMBED!",
@@ -14,32 +14,56 @@ const VICTORY_LINES = [
   "PIPEBOMB-PROOF PILOT!",
 ];
 
-const TRANSITION_MS = 1600;
+const PRE_COUNTDOWN_MS = 1800; // message shows alone for this long, then countdown starts
 
 export default function GameOver({ stats, onRestart, onHome }) {
-  const [transitionMsg, setTransitionMsg] = useState(null);
+  const [transition, setTransition] = useState(null); // { msg, next: "restart"|"home" }
+  const [countdown, setCountdown] = useState(null);   // 3 | 2 | 1 | null
+
   const isVictory = !!stats.victory;
   const headline = useMemo(() => {
     const pool = isVictory ? VICTORY_LINES : DEATH_LINES;
     return pool[Math.floor(Math.random() * pool.length)];
   }, [isVictory]);
 
+  // Drive the countdown when transition starts
+  useEffect(() => {
+    if (!transition) return undefined;
+    const startCountdownT = setTimeout(() => setCountdown(3), PRE_COUNTDOWN_MS);
+    return () => clearTimeout(startCountdownT);
+  }, [transition]);
+
+  useEffect(() => {
+    if (countdown === null) return undefined;
+    if (countdown <= 0) {
+      // proceed
+      if (transition?.next === "restart") onRestart();
+      else if (transition?.next === "home") onHome();
+      return undefined;
+    }
+    const t = setTimeout(() => setCountdown((c) => (c === null ? null : c - 1)), 1000);
+    return () => clearTimeout(t);
+  }, [countdown, transition, onRestart, onHome]);
+
   const handleUndock = () => {
-    if (transitionMsg) return;
-    setTransitionMsg("Jump clone activated — undocking now!");
-    setTimeout(() => onRestart(), TRANSITION_MS);
+    if (transition) return;
+    setTransition({ msg: "Jump clone activated — undocking now!", next: "restart" });
   };
 
   const handleStation = () => {
-    if (transitionMsg) return;
-    setTransitionMsg("Docking request accepted! Thanks for playing! o7");
-    setTimeout(() => onHome(), TRANSITION_MS);
+    if (transition) return;
+    setTransition({ msg: "Docking request accepted! Thanks for playing! o7", next: "home" });
   };
 
-  if (transitionMsg) {
+  if (transition) {
     return (
       <section className="transition-screen" data-testid="transition-screen">
-        <p className="transition-msg" data-testid="transition-msg">{transitionMsg}</p>
+        <p className="transition-msg" data-testid="transition-msg">{transition.msg}</p>
+        {countdown !== null && countdown > 0 && (
+          <p className="transition-count" key={countdown} data-testid="transition-count">
+            {countdown}
+          </p>
+        )}
       </section>
     );
   }

@@ -754,10 +754,12 @@ body {
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 2rem;
     text-align: center;
+    gap: 28px;
 }
 
 .transition-msg {
@@ -774,9 +776,28 @@ body {
     animation: transition-fade 0.35s ease-out both;
 }
 
+.transition-count {
+    font-family: "Audiowide", "Major Mono Display", monospace;
+    font-size: clamp(80px, 14vw, 180px);
+    color: #fff;
+    line-height: 1;
+    margin: 0;
+    text-shadow:
+        0 0 16px rgba(255, 255, 255, 0.7),
+        0 0 32px rgba(217, 70, 239, 0.6),
+        0 0 64px rgba(168, 85, 247, 0.5);
+    animation: count-pulse 1s ease-out both;
+}
+
 @keyframes transition-fade {
     0%   { opacity: 0; transform: translateY(8px) scale(0.97); filter: blur(6px); }
     100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes count-pulse {
+    0%   { opacity: 0; transform: scale(1.6); filter: blur(8px); }
+    25%  { opacity: 1; transform: scale(1); filter: blur(0); }
+    100% { opacity: 0.4; transform: scale(0.92); filter: blur(0); }
 }
 
 .over-stats {
