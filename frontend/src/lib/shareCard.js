@@ -7,6 +7,11 @@ async function captureBlob(node) {
     scale: 2,
     useCORS: true,
     logging: false,
+    // Extra breathing room around the card in the final image.
+    x: -24,
+    y: -24,
+    width: node.offsetWidth + 48,
+    height: node.offsetHeight + 48,
     // html2canvas can choke on modern color funcs; we only use hex/rgba so we're good.
   });
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));

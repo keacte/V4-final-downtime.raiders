@@ -873,6 +873,18 @@ body {
 /* ===== Shareable Death Card ===== */
 .share-card {
     position: relative;
+    transition: padding 0s;
+}
+
+/* When capturing, add breathing room + a subtle bordered backdrop so the
+   exported PNG doesn't look cramped edge-to-edge. */
+.share-card.is-capturing {
+    padding: 28px 28px 20px;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    background:
+        radial-gradient(ellipse at top, rgba(124, 58, 237, 0.25), transparent 60%),
+        linear-gradient(180deg, rgba(18, 6, 52, 0.9), rgba(7, 2, 26, 0.95));
+    box-shadow: 0 0 40px rgba(217, 70, 239, 0.25) inset;
 }
 
 /* Export-only brand footer: rendered visually only when capturing.
