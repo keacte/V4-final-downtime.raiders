@@ -338,6 +338,7 @@ export default function Game({ onDeath }) {
     s.spawnQueue = buildSpawnQueue(0);
     s.spawnCooldown = 30;
     s.waveBanner = 90;
+
     let raf;
     let lastSync = 0;
 
