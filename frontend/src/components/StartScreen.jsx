@@ -1,7 +1,7 @@
 import React from "react";
-import { Rocket } from "lucide-react";
+import { Rocket, Info } from "lucide-react";
 
-export default function StartScreen({ onStart }) {
+export default function StartScreen({ onStart, onShowGlossary }) {
   return (
     <section className="menu-shell warp-in" data-testid="start-screen">
       <div className="menu-center">
@@ -53,6 +53,14 @@ export default function StartScreen({ onStart }) {
             data-testid="start-btn"
           >
             <Rocket size={16} /> UNDOCK &amp; ENGAGE
+          </button>
+          <button
+            type="button"
+            className="eve-btn eve-btn-cyan"
+            onClick={onShowGlossary}
+            data-testid="glossary-btn"
+          >
+            <Info size={16} /> POWER-UP INFO
           </button>
         </div>
 

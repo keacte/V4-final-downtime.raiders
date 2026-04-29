@@ -373,7 +373,7 @@ export default function Game({ onDeath }) {
       const p = s.player;
 
       // input movement
-      const speedMult = hasPowerup(s, "speed") ? 1.6 : 1;
+      const speedMult = hasPowerup(s, "speed") ? 1.42 : 1;
       const accel = 0.7 * speedMult;
       const friction = 0.88;
       if (s.keys["arrowleft"] || s.keys["a"]) p.vx -= accel;

@@ -4,6 +4,7 @@ import Game from "./components/Game";
 import StartScreen from "./components/StartScreen";
 import GameOver from "./components/GameOver";
 import TransitionScreen from "./components/TransitionScreen";
+import Glossary from "./components/Glossary";
 import { Toaster } from "sonner";
 import { Volume2, VolumeX } from "lucide-react";
 import { sfx, setMuted, isMuted, unlockAudio, startMusic, stopMusic } from "./lib/sounds";
@@ -112,7 +113,13 @@ function App() {
       )}
 
       {screen === "start" && (
-        <StartScreen onStart={handleStart} />
+        <StartScreen
+          onStart={handleStart}
+          onShowGlossary={() => { sfx.click(); setScreen("glossary"); }}
+        />
+      )}
+      {screen === "glossary" && (
+        <Glossary onBack={() => { sfx.click(); setScreen("start"); }} />
       )}
       {screen === "launching" && (
         <TransitionScreen
