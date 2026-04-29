@@ -770,18 +770,17 @@ body {
 
 .kr-list li {
     display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    column-gap: 8px;
-    padding: 3px 0;
-    line-height: 1.35;
+    grid-template-columns: auto auto 1fr;
+    column-gap: 12px;
+    padding: 2px 0;
+    line-height: 1.4;
+    align-items: baseline;
 }
 
 .kr-list li::before {
     content: "•";
     color: var(--neon-purple-bright);
     grid-column: 1;
-    grid-row: 1;
     flex: 0 0 auto;
 }
 
@@ -790,24 +789,22 @@ body {
 .kr-key {
     color: var(--text-dim);
     grid-column: 2;
-    grid-row: 1;
     white-space: nowrap;
     min-width: 0;
 }
 
 .kr-val {
     color: var(--text-main);
-    grid-column: 2;
-    grid-row: 2;
+    grid-column: 3;
     word-break: break-word;
 }
 
 /* Loss section keeps single-line items (no key) */
 .kr-list--loss li {
-    grid-template-rows: auto;
+    grid-template-columns: auto 1fr;
 }
 .kr-list--loss .kr-val {
-    grid-row: 1;
+    grid-column: 2;
 }
 
 /* Inline (smaller) stat row variant */
