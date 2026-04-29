@@ -1093,11 +1093,6 @@ export default function Game({ onDeath }) {
         <div className="hud-block">
           <div className="hud-label">Lives</div>
           <div className="hud-value" data-testid="hud-lives">{"♦".repeat(Math.max(0, hud.lives))}</div>
-          <div className="hud-sah" data-testid="hud-sah" aria-label="Ship status: shield, armor, structure">
-            <span className={`sah-bar sah-s ${hud.shield > 0 ? "on" : ""}`} data-testid="sah-shield" title="Shield" aria-label="Shield" />
-            <span className={`sah-bar sah-a ${hud.armor  > 0 ? "on" : ""}`} data-testid="sah-armor"  title="Armor" aria-label="Armor" />
-            <span className={`sah-bar sah-h ${hud.hull   > 0 ? "on" : ""}`} data-testid="sah-hull"   title="Structure" aria-label="Structure" />
-          </div>
         </div>
         <div className="hud-block">
           <div className="hud-label">Bombs [X]</div>
@@ -1125,6 +1120,17 @@ export default function Game({ onDeath }) {
 
       <div className="canvas-wrap">
         <canvas ref={canvasRef} className="game-canvas" data-testid="game-canvas" />
+        <div className="ship-status" data-testid="ship-status" aria-label="Ship status: shield, armor, structure">
+          <div className={`status-bar status-shield ${hud.shield > 0 ? "on" : ""}`} data-testid="sah-shield" title="Shield">
+            <span className="status-bar-label">SHIELD</span>
+          </div>
+          <div className={`status-bar status-armor ${hud.armor > 0 ? "on" : ""}`} data-testid="sah-armor" title="Armor">
+            <span className="status-bar-label">ARMOR</span>
+          </div>
+          <div className={`status-bar status-structure ${hud.hull > 0 ? "on" : ""}`} data-testid="sah-hull" title="Structure">
+            <span className="status-bar-label">STRUCTURE</span>
+          </div>
+        </div>
       </div>
     </div>
   );

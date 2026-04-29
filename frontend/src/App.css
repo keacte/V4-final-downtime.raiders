@@ -626,34 +626,64 @@ body {
     box-shadow: 0 0 10px currentColor;
 }
 
-/* ===== Ship status bars: Shield / Armor / Structure (EVE-style) ===== */
-.hud-sah {
-    display: inline-flex;
-    gap: 4px;
-    margin-top: 6px;
+/* ===== Ship status bars at bottom of canvas: Shield / Armor / Structure ===== */
+.canvas-wrap { position: relative; }
+.ship-status {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    pointer-events: none;
+    z-index: 5;
 }
-.sah-bar {
-    width: 22px;
-    height: 8px;
+.status-bar {
+    position: relative;
+    width: clamp(80px, 12vw, 140px);
+    height: 14px;
     border: 1px solid currentColor;
-    color: rgba(139, 109, 184, 0.35); /* dim border when destroyed */
-    background: rgba(0, 0, 0, 0.45);
-    transition: color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+    color: rgba(139, 109, 184, 0.4);
+    background: rgba(0, 0, 0, 0.55);
+    transition: color 200ms ease, background 200ms ease, box-shadow 200ms ease;
 }
-.sah-bar.on.sah-s {
+.status-bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #fff;
+    text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.8);
+    line-height: 1;
+}
+.status-bar.on.status-shield {
     color: #22c55e;
-    background: #22c55e;
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+    background: linear-gradient(180deg, #4ade80, #22c55e);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
 }
-.sah-bar.on.sah-a {
+.status-bar.on.status-armor {
     color: #f97316;
-    background: #f97316;
-    box-shadow: 0 0 8px rgba(249, 115, 22, 0.7);
+    background: linear-gradient(180deg, #fb923c, #f97316);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.8);
 }
-.sah-bar.on.sah-h {
+.status-bar.on.status-structure {
     color: #ef4444;
-    background: #ef4444;
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+    background: linear-gradient(180deg, #f87171, #ef4444);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+}
+.status-bar:not(.on) .status-bar-label {
+    color: rgba(255, 255, 255, 0.35);
+    text-shadow: none;
+}
+
+@media (max-width: 720px) {
+    .ship-status { gap: 5px; bottom: 8px; }
+    .status-bar { height: 12px; }
+    .status-bar-label { font-size: 9px; letter-spacing: 0.16em; }
 }
 
 
