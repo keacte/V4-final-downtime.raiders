@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 
 const DEATH_LINES = [
   "YOU GOT PIPEBOMBED!",
@@ -14,22 +14,12 @@ const VICTORY_LINES = [
   "PIPEBOMB-PROOF PILOT!",
 ];
 
-export default function GameOver({ stats, onSubmit, onRestart, onHome, submitting }) {
-  const [pilot, setPilot] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+export default function GameOver({ stats, onRestart, onHome }) {
   const isVictory = !!stats.victory;
   const headline = useMemo(() => {
     const pool = isVictory ? VICTORY_LINES : DEATH_LINES;
     return pool[Math.floor(Math.random() * pool.length)];
   }, [isVictory]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const name = pilot.trim();
-    if (!name) return;
-    await onSubmit(name);
-    setSubmitted(true);
-  };
 
   return (
     <section className="over-wrap" data-testid="game-over-screen">
@@ -52,29 +42,6 @@ export default function GameOver({ stats, onSubmit, onRestart, onHome, submittin
           <div className="over-stat-value" data-testid="final-kills">{stats.kills}</div>
         </div>
       </div>
-
-      {!submitted && (
-        <form className="over-form" onSubmit={handleSubmit} data-testid="submit-score-form">
-          <input
-            type="text"
-            className="over-input"
-            placeholder="PILOT NAME"
-            value={pilot}
-            onChange={(e) => setPilot(e.target.value.toUpperCase().slice(0, 16))}
-            maxLength={16}
-            data-testid="pilot-name-input"
-            disabled={submitting}
-          />
-          <button
-            type="submit"
-            className="eve-btn"
-            disabled={submitting || !pilot.trim()}
-            data-testid="submit-score-btn"
-          >
-            {submitting ? "..." : "SAVE"}
-          </button>
-        </form>
-      )}
 
       <div className="over-actions">
         <button type="button" className="eve-btn" onClick={onRestart} data-testid="restart-btn">

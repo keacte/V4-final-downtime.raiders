@@ -1,11 +1,10 @@
 import React from "react";
-import { Rocket, Trophy } from "lucide-react";
+import { Rocket } from "lucide-react";
 
-export default function StartScreen({ onStart, onShowKillboard }) {
+export default function StartScreen({ onStart }) {
   return (
     <section className="menu-shell warp-in" data-testid="start-screen">
       <div className="menu-center">
-        {/* Logos */}
         <a
           href="https://npsi.rocks/"
           target="_blank"
@@ -27,17 +26,14 @@ export default function StartScreen({ onStart, onShowKillboard }) {
           />
         </a>
 
-        {/* Title */}
         <h1 className="title-eve" data-testid="game-title">
           downtime<span className="dot">.</span>raiders
         </h1>
 
-        {/* Uplink status */}
         <div className="uplink-row">
           <span className="uplink-stable">UPLINK STABLE</span>
         </div>
 
-        {/* Description */}
         <p className="briefing" data-testid="briefing">
           The server&apos;s down for daily maintenance. While CCP reboots, raid New
           Eden in your <span className="hl-pink">Rifter</span> across{' '}
@@ -48,7 +44,6 @@ export default function StartScreen({ onStart, onShowKillboard }) {
           Multi-shot, Smart Bomb and Speed. Don&apos;t get pipebombed. o7
         </p>
 
-        {/* Action buttons */}
         <div className="menu-actions">
           <button
             type="button"
@@ -58,17 +53,8 @@ export default function StartScreen({ onStart, onShowKillboard }) {
           >
             <Rocket size={16} /> UNDOCK &amp; ENGAGE
           </button>
-          <button
-            type="button"
-            className="eve-btn eve-btn-pink"
-            onClick={onShowKillboard}
-            data-testid="show-killboard-btn"
-          >
-            <Trophy size={16} /> KILLBOARD
-          </button>
         </div>
 
-        {/* Key controls */}
         <div className="menu-controls" data-testid="menu-controls">
           <span className="kbd">W</span>
           <span className="kbd">A</span>
