@@ -29,6 +29,10 @@ function App() {
   const handleStart = () => {
     unlockAudio();
     sfx.click();
+    setScreen("launching");
+  };
+
+  const handleLaunchComplete = () => {
     setScreen("playing");
   };
 
@@ -104,6 +108,13 @@ function App() {
 
       {screen === "start" && (
         <StartScreen onStart={handleStart} />
+      )}
+      {screen === "launching" && (
+        <TransitionScreen
+          msg="Fly safe Capsuleer — see you on the other side! o7"
+          countdown={true}
+          onComplete={handleLaunchComplete}
+        />
       )}
       {screen === "playing" && (
         <main className="play-main" data-testid="play-main">

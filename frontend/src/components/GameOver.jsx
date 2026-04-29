@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useEffect } from "react";
-import { sfx } from "../lib/sounds";
+import React, { useMemo, useState } from "react";
+import TransitionScreen from "./TransitionScreen";
 
 const DEATH_LINES = [
   "YOU GOT PIPEBOMBED!",
@@ -15,12 +15,8 @@ const VICTORY_LINES = [
   "PIPEBOMB-PROOF PILOT!",
 ];
 
-const PRE_COUNTDOWN_MS = 1800; // message shows alone before countdown starts
-const STATION_HOLD_MS = 2600;  // station message duration (no countdown)
-
 export default function GameOver({ stats, onRestart, onHome }) {
-  const [transition, setTransition] = useState(null); // { msg, next, countdown }
-  const [countdown, setCountdown] = useState(null);   // 3 | 2 | 1 | null
+  const [transition, setTransition] = useState(null);
 
   const isVictory = !!stats.victory;
   const headline = useMemo(() => {
@@ -28,38 +24,12 @@ export default function GameOver({ stats, onRestart, onHome }) {
     return pool[Math.floor(Math.random() * pool.length)];
   }, [isVictory]);
 
-  // Start the timer once a transition is set
-  useEffect(() => {
-    if (!transition) return undefined;
-    if (transition.countdown) {
-      const t = setTimeout(() => setCountdown(3), PRE_COUNTDOWN_MS);
-      return () => clearTimeout(t);
-    }
-    // No countdown — just hold the message and transition
-    const t = setTimeout(() => onHome(), STATION_HOLD_MS);
-    return () => clearTimeout(t);
-  }, [transition, onHome]);
-
-  // Drive countdown ticks
-  useEffect(() => {
-    if (countdown === null) return undefined;
-    if (countdown <= 0) {
-      sfx.countdownGo();
-      if (transition?.next === "restart") onRestart();
-      else if (transition?.next === "home") onHome();
-      return undefined;
-    }
-    sfx.countdownTick(countdown);
-    const t = setTimeout(() => setCountdown((c) => (c === null ? null : c - 1)), 1000);
-    return () => clearTimeout(t);
-  }, [countdown, transition, onRestart, onHome]);
-
   const handleUndock = () => {
     if (transition) return;
     setTransition({
       msg: "Jump clone activated — undocking now!",
-      next: "restart",
       countdown: true,
+      onComplete: onRestart,
     });
   };
 
@@ -67,21 +37,18 @@ export default function GameOver({ stats, onRestart, onHome }) {
     if (transition) return;
     setTransition({
       msg: "Docking request accepted! Thanks for playing! o7",
-      next: "home",
       countdown: false,
+      onComplete: onHome,
     });
   };
 
   if (transition) {
     return (
-      <section className="transition-screen" data-testid="transition-screen">
-        <p className="transition-msg" data-testid="transition-msg">{transition.msg}</p>
-        {transition.countdown && countdown !== null && countdown > 0 && (
-          <p className="transition-count" key={countdown} data-testid="transition-count">
-            {countdown}
-          </p>
-        )}
-      </section>
+      <TransitionScreen
+        msg={transition.msg}
+        countdown={transition.countdown}
+        onComplete={transition.onComplete}
+      />
     );
   }
 
