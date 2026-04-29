@@ -69,7 +69,7 @@ const POWERUPS = [
   {
     type: "invuln",
     icon: "I",
-    color: "#fbbf24",
+    color: "#f97316",
     name: "Invulnerability",
     duration: "2 waves",
     effect: "Zero damage taken from anything for the next 2 waves. Unstoppable.",

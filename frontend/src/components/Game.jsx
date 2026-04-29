@@ -77,7 +77,7 @@ const POWERUP_DEFS = {
   life:     { color: "#c084fc", label: "EXTRA LIFE", duration: 0,    icon: "♥" }, // heart (purple)
   // Wave-based powerups (waveDuration = number of waves the buff covers, including pickup wave)
   cloak:    { color: "#a5f3fc", label: "CLOAK",      duration: 0, waveDuration: 1, icon: "C" },
-  invuln:   { color: "#fbbf24", label: "INVULN",     duration: 0, waveDuration: 2, icon: "I" },
+  invuln:   { color: "#f97316", label: "INVULN",     duration: 0, waveDuration: 2, icon: "I" },
   star:     { color: "#fde047", label: "STAR",       duration: 0, waveDuration: 3, icon: "★" },
 };
 
@@ -1215,8 +1215,8 @@ function drawPlayer(ctx, s) {
 
   // invuln gold ring
   if (hasInvuln) {
-    ctx.strokeStyle = "rgba(251, 191, 36, 0.95)";
-    ctx.shadowColor = "rgba(251, 191, 36, 0.8)";
+    ctx.strokeStyle = "rgba(249, 115, 22, 0.95)";
+    ctx.shadowColor = "rgba(249, 115, 22, 0.8)";
     ctx.shadowBlur = 12;
     ctx.lineWidth = 3;
     ctx.beginPath();
